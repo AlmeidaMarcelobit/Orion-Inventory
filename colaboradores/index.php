@@ -249,9 +249,9 @@ $totalHomeOffice           = count(array_filter($colaboradores, fn($c) => ($c['t
         </div>
         <?php if ($is_admin): ?>
             <div style="display: flex; gap: 0.75rem;">
-                <a href="adicionar.php" class="btn btn-primary"><i class="fas fa-user-plus"></i> Adicionar Colaborador</a>
-                <a href="../terceiros/index.php" class="btn btn-secondary"><i class="fas fa-users"></i> Terceiros</a>
-                <a href="inativos.php" class="btn btn-secondary"><i class="fas fa-box-archive"></i> Ver Inativos</a>
+                <a href="adicionar.php" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fas fa-user-plus"></i> Adicionar Colaborador</a>
+                <a href="../terceiros/index.php" target="_blank" rel="noopener noreferrer" class="btn btn-secondary"><i class="fas fa-users"></i> Terceiros</a>
+                <a href="inativos.php" target="_blank" rel="noopener noreferrer" class="btn btn-secondary"><i class="fas fa-box-archive"></i> Ver Inativos</a>
             </div>
         <?php endif; ?>
     </div>
@@ -310,7 +310,7 @@ $totalHomeOffice           = count(array_filter($colaboradores, fn($c) => ($c['t
             <?php if ($busca): ?>
                 <a href="index.php" class="btn btn-secondary">Limpar busca</a>
             <?php else: ?>
-                <a href="adicionar.php" class="btn btn-primary">Adicionar primeiro colaborador</a>
+                <a href="adicionar.php" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Adicionar primeiro colaborador</a>
             <?php endif; ?>
         </div>
     <?php else: ?>
@@ -350,14 +350,14 @@ $totalHomeOffice           = count(array_filter($colaboradores, fn($c) => ($c['t
                         <td class="nowrap"><?php echo htmlspecialchars(formatarCPF($colaborador['cpf']) ?: '—'); ?></td>
                         <td>
                             <?php foreach ($linhasColab as $linha): ?>
-                                <a class="table-line nowrap" href="../linhas/index.php?colaborador=<?php echo (int)$colaborador['id']; ?>"><?php echo htmlspecialchars(formatarTelefone($linha['numero'] ?? '')); ?></a>
+                                <a class="table-line nowrap" target="_blank" rel="noopener noreferrer" href="../linhas/index.php?colaborador=<?php echo (int)$colaborador['id']; ?>"><?php echo htmlspecialchars(formatarTelefone($linha['numero'] ?? '')); ?></a>
                             <?php endforeach; ?>
                             <?php if (!$linhasColab): ?><span class="text-muted">—</span><?php endif; ?>
                         </td>
                         <td>
                             <?php foreach ($equipamentosColab as $equip): ?>
                                 <?php if (!empty($equip['hostname'])): ?>
-                                    <a class="table-line nowrap" href="../equipamentos/index.php?colaborador=<?php echo (int)$colaborador['id']; ?>"><?php echo htmlspecialchars($equip['hostname']); ?></a>
+                                    <a class="table-line nowrap" target="_blank" rel="noopener noreferrer" href="../equipamentos/index.php?colaborador=<?php echo (int)$colaborador['id']; ?>"><?php echo htmlspecialchars($equip['hostname']); ?></a>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                             <?php if (!array_filter($equipamentosColab, fn($equip) => !empty($equip['hostname']))): ?><span class="text-muted">—</span><?php endif; ?>
@@ -393,7 +393,7 @@ $totalHomeOffice           = count(array_filter($colaboradores, fn($c) => ($c['t
                         <?php endforeach; ?>
                         <td class="table-action">
                             <?php if (count($equipamentosColab) > 0): ?>
-                                <a href="../equipamentos/index.php?colaborador=<?php echo (int)$colaborador['id']; ?>"
+                                <a href="../equipamentos/index.php?colaborador=<?php echo (int)$colaborador['id']; ?>" target="_blank" rel="noopener noreferrer"
                                    class="equipment-count-badge has-equipment"
                                    title="Ver <?php echo count($equipamentosColab); ?> equipamento(s) vinculado(s)"
                                    aria-label="<?php echo count($equipamentosColab); ?> equipamento(s) vinculado(s) a <?php echo htmlspecialchars($colaborador['nome']); ?>">
@@ -425,7 +425,7 @@ $totalHomeOffice           = count(array_filter($colaboradores, fn($c) => ($c['t
                                 </form>
                             </td>
                             <td class="table-action">
-                                <a href="editar.php?id=<?php echo (int)$colaborador['id']; ?>" class="table-icon-button edit" title="Editar colaborador" aria-label="Editar <?php echo htmlspecialchars($colaborador['nome']); ?>"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                                <a href="editar.php?id=<?php echo (int)$colaborador['id']; ?>" target="_blank" rel="noopener noreferrer" class="table-icon-button edit" title="Editar colaborador" aria-label="Editar <?php echo htmlspecialchars($colaborador['nome']); ?>"><i class="fas fa-edit" aria-hidden="true"></i></a>
                             </td>
                         <?php endif; ?>
                     </tr>
