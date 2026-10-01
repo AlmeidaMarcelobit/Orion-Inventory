@@ -1,0 +1,93 @@
+@import '../../global/global.css';
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url("../../../../img/global/background/bg.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+.container {
+    width: 420px;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #fff;
+    padding: 30px 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.container img {
+    width: 270px;
+    height: 100px;
+    align-items: center;
+}
+.input-box {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
+}
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    font-size: 16px;
+    color: #fff;
+    padding: 20px 45px 20px 20px;
+    border-radius: 12px;
+}
+
+.input-box input::placeholder {
+    color: #e9e6e6;
+}
+
+.input-box i {
+    position: absolute;
+    right: 20px;
+    font-size: 20px;
+    top: 50%;
+    /*Centralizar icone no input*/
+    transform: translateY(-50%);
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    margin: -15px 0 15px;
+    font-size: 12px;
+}
+
+.remember-forgot label input {
+    accent-color: #fff;
+    margin-right: 5px;
+}
+.remember-forgot a {
+    text-decoration: none;
+    color: #fff;
+}
+.remember-forgot a:hover {
+    text-decoration: underline;
+}
+.login {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login:hover {
+    background-color: transparent;
+    color: #fff;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+}
