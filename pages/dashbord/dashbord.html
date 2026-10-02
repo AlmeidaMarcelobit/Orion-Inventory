@@ -61,7 +61,7 @@
                 </ul>
             </nav>
             <div class="logo">
-                <a href="index.php">
+                <a href="logout.php">
                     <img src="../../img/global/logos/orion" alt="" />
                 </a>
             </div>
@@ -174,10 +174,12 @@
     <script>
 const recentes = document.getElementById('colaboradores-recentes');
 fetch('../../data/colaboradores/ativos.json').then(r => r.json()).then(colaboradores => {
-    const lista = colaboradores.sort((a,b) => new Date(b.data_cadastro || b.data_atualizacao || 0) - new Date(a.data_cadastro || a.data_atualizacao || 0)).slice(0,6git sity );
+    const lista = colaboradores.sort((a,b) => new Date(b.data_cadastro || b.data_atualizacao || 0) - new Date(a.data_cadastro || a.data_atualizacao || 0)).slice(0,6);
     recentes.innerHTML = lista.length ? lista.map(c => '<article class="recent-item"><div class="recent-avatar"><i class="fas fa-user"></i></div><div class="recent-info"><strong>' + escapeHtml(c.nome || 'Sem nome') + '</strong><span>' + escapeHtml(c.cargo || c.departamento || 'Colaborador') + '</span></div><time>' + formatarData(c.data_cadastro || c.data_atualizacao) + '</time></article>').join('') : '<div class="recent-empty">Nenhum colaborador cadastrado.</div>';
 }).catch(() => { recentes.innerHTML = '<div class="recent-empty">Não foi possível carregar os colaboradores.</div>'; });
 function formatarData(valor){if(!valor)return 'Data não informada';const data=new Date(valor.replace(' ','T'));return Number.isNaN(data.getTime())?valor:data.toLocaleDateString('pt-BR');}
 function escapeHtml(valor){return String(valor).replace(/[&<>"']/g,c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 </script></body>
 </html>
+
+
