@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $acao === 'inativar') {
             $equipamento['status'] = 'pendente_devolucao';
             $equipamento['data_pendencia_devolucao'] = date('Y-m-d H:i:s');
             $equipamento['motivo_pendencia'] = 'Colaborador inativado';
+            $equipamento['colaborador_nome'] = $colaborador['nome'] ?? '';
             $pendencias[] = $equipamento;
         }
         unset($equipamento);
@@ -102,6 +103,7 @@ usort($colaboradores, fn($a,$b) => strcasecmp($a['nome'] ?? '', $b['nome'] ?? ''
 </main>
 <footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer>
 </body></html>
+
 
 
 

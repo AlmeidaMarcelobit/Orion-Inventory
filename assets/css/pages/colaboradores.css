@@ -12,3 +12,5 @@
 .work-status,.software-status{text-align:center}.work-status i{color:#2374e1;font-size:18px}.software-status i{font-size:17px}
 
 .page-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.secondary-action{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#fff;color:#4b5563;border:1px solid var(--orion-border);text-decoration:none;font-size:13px;font-weight:600}.secondary-action:hover{color:var(--orion-pink);border-color:var(--orion-pink);background:#fff7fb}
+
+.pending-return td{background:#fff7d6!important;border-bottom-color:#f0d77a!important}.return-button{border:0;border-radius:8px;padding:8px 11px;color:#8a5b00;background:#ffe6a3;cursor:pointer;font-size:12px;font-weight:600}.return-button:hover{background:#f7cf65}
