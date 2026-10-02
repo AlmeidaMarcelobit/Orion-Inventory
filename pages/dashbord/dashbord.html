@@ -5,6 +5,8 @@
         <meta name="author" content="Marcelo Mascarenhas de Araujo Almeida" />
         <title>Dashbord</title>
         <link rel="stylesheet" href="../../assets/css/global/import.css" />
+        <link rel="stylesheet" href="../../assets/css/pages/dashboard.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     </head>
     <body>
         <header>
@@ -60,80 +62,122 @@
             </nav>
             <div class="logo">
                 <a href="index.php">
-                    <img src="" alt="" />
+                    <img src="../../img/global/logos/orion" alt="" />
                 </a>
             </div>
             <div class="usuario-menu">
                 <span class="usuario-nome">Administrador</span>
             </div>
-            <a href="logout.php" class="sair-btn">
+            <a href="../../index.php" class="sair-btn">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>
             </a>
-        </header>        <main class="grid-cards">
+        </header>
+        <main class="grid-cards">
             <div class="stat-card">
                 <div class="stat-icon primary"><i class="fas fa-users"></i></div>
                 <div class="stat-content">
-                    <h3>Colaboradores</h3><p class="stat-number" id="total-colaboradores">—</p>
-                    <div class="stat-detail"><span><i class="fas fa-home"></i> Home: <b id="colaboradores-home">—</b></span><span><i class="fas fa-building"></i> Local: <b id="colaboradores-local">—</b></span></div>
+                    <h3>Colaboradores</h3>
+                    <p class="stat-number" id="total-colaboradores">—</p>
+                    <div class="stat-detail">
+                        <span><i class="fas fa-home"></i> Home: <b id="colaboradores-home">—</b></span
+                        ><span><i class="fas fa-building"></i> Local: <b id="colaboradores-local">—</b></span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon success"><i class="fas fa-laptop"></i></div>
                 <div class="stat-content">
-                    <h3>Equipamentos</h3><p class="stat-number" id="total-equipamentos">—</p>
-                    <div class="stat-detail"><span><i class="fas fa-warehouse"></i> Estoque: <b id="equipamentos-estoque">—</b></span><span><i class="fas fa-user-check"></i> Alocados: <b id="equipamentos-alocados">—</b></span></div>
+                    <h3>Equipamentos</h3>
+                    <p class="stat-number" id="total-equipamentos">—</p>
+                    <div class="stat-detail">
+                        <span><i class="fas fa-warehouse"></i> Estoque: <b id="equipamentos-estoque">—</b></span
+                        ><span><i class="fas fa-user-check"></i> Alocados: <b id="equipamentos-alocados">—</b></span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon info"><i class="fas fa-phone"></i></div>
                 <div class="stat-content">
-                    <h3>Linhas</h3><p class="stat-number" id="total-linhas">—</p>
-                    <div class="stat-detail"><span><i class="fas fa-check-circle"></i> Disponíveis: <b id="linhas-disponiveis">—</b></span><span><i class="fas fa-user-check"></i> Alocadas: <b id="linhas-alocadas">—</b></span></div>
+                    <h3>Linhas</h3>
+                    <p class="stat-number" id="total-linhas">—</p>
+                    <div class="stat-detail">
+                        <span><i class="fas fa-check-circle"></i> Disponíveis: <b id="linhas-disponiveis">—</b></span
+                        ><span><i class="fas fa-user-check"></i> Alocadas: <b id="linhas-alocadas">—</b></span>
+                    </div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon warning"><i class="fas fa-chart-pie"></i></div>
                 <div class="stat-content">
-                    <h3>Ocupação</h3><p class="stat-number" id="ocupacao-percentual">—</p>
-                    <div class="stat-detail"><span><i class="fas fa-chart-line"></i> Equipamentos alocados</span></div>
+                    <h3>Ocupação</h3>
+                    <p class="stat-number" id="ocupacao-percentual">—</p>
+                    <div class="stat-detail">
+                        <span><i class="fas fa-chart-line"></i> Equipamentos alocados</span>
+                    </div>
                 </div>
             </div>
+            <section class="recent-section">
+            <div class="section-heading"><div><h2><i class="fas fa-user-plus"></i> Lista de colaboradores adicionados por último</h2><p>Confira os cadastros mais recentes</p></div><a href="#" class="section-link">Ver todos <i class="fas fa-arrow-right"></i></a></div>
+            <div id="colaboradores-recentes" class="recent-list"><div class="recent-loading">Carregando colaboradores...</div></div>
+        </section>   
         </main>
-        <footer>
+             <footer>
             <p>Orion Inventory &copy; 2023 - 2026 - Todos os direitos reservados</p>
         </footer>
-    <script>
-const base = '../../data/';
-const json = arquivo => fetch(base + arquivo).then(r => r.json());
-const total = lista => Array.isArray(lista) ? lista.length : 0;
+        <script>
+            const base = "../../data/";
+            const json = (arquivo) => fetch(base + arquivo).then((r) => r.json());
+            const total = (lista) => (Array.isArray(lista) ? lista.length : 0);
 
-Promise.all([
-    json('colaboradores/ativos.json'),
-    json('equipamentos/estoque.json'),
-    json('equipamentos/alocados.json'),
-    json('equipamentos/emprestados.json'),
-    json('equipamentos/internos.json'),
-    json('equipamentos/manutencao.json'),
-    json('equipamentos/fora_uso.json'),
-    json('linhas.json')
-]).then(([colaboradores, estoque, alocados, emprestados, internos, manutencao, foraUso, linhas]) => {
-    const equipamentosAlocados = total(alocados);
-    const equipamentosTotais = [estoque, alocados, emprestados, internos, manutencao, foraUso].reduce((s, lista) => s + total(lista), 0);
-    const linhasAlocadas = linhas.filter(l => l.status === 'alocado' || l.status === 'emprestado').length;
-    const ocupacao = equipamentosTotais ? Math.round((equipamentosAlocados / equipamentosTotais) * 100) : 0;
-    document.getElementById('total-colaboradores').textContent = total(colaboradores);
-    document.getElementById('colaboradores-home').textContent = colaboradores.filter(c => c.tipo_trabalho === 'home').length;
-    document.getElementById('colaboradores-local').textContent = colaboradores.filter(c => c.tipo_trabalho !== 'home').length;
-    document.getElementById('total-equipamentos').textContent = equipamentosTotais;
-    document.getElementById('equipamentos-estoque').textContent = total(estoque);
-    document.getElementById('equipamentos-alocados').textContent = equipamentosAlocados;
-    document.getElementById('total-linhas').textContent = total(linhas);
-    document.getElementById('linhas-disponiveis').textContent = total(linhas) - linhasAlocadas;
-    document.getElementById('linhas-alocadas').textContent = linhasAlocadas;
-    document.getElementById('ocupacao-percentual').textContent = ocupacao + '%';
-}).catch(() => {
-    document.querySelectorAll('.stat-number, .stat-detail b').forEach(el => el.textContent = '—');
-});
+            Promise.all([
+                json("colaboradores/ativos.json"),
+                json("equipamentos/estoque.json"),
+                json("equipamentos/alocados.json"),
+                json("equipamentos/emprestados.json"),
+                json("equipamentos/internos.json"),
+                json("equipamentos/manutencao.json"),
+                json("equipamentos/fora_uso.json"),
+                json("linhas.json")
+            ])
+                .then(([colaboradores, estoque, alocados, emprestados, internos, manutencao, foraUso, linhas]) => {
+                    const equipamentosAlocados = total(alocados);
+                    const equipamentosTotais = [estoque, alocados, emprestados, internos, manutencao, foraUso].reduce(
+                        (s, lista) => s + total(lista),
+                        0
+                    );
+                    const linhasAlocadas = linhas.filter(
+                        (l) => l.status === "alocado" || l.status === "emprestado"
+                    ).length;
+                    const ocupacao = equipamentosTotais
+                        ? Math.round((equipamentosAlocados / equipamentosTotais) * 100)
+                        : 0;
+                    document.getElementById("total-colaboradores").textContent = total(colaboradores);
+                    document.getElementById("colaboradores-home").textContent = colaboradores.filter(
+                        (c) => c.tipo_trabalho === "home"
+                    ).length;
+                    document.getElementById("colaboradores-local").textContent = colaboradores.filter(
+                        (c) => c.tipo_trabalho !== "home"
+                    ).length;
+                    document.getElementById("total-equipamentos").textContent = equipamentosTotais;
+                    document.getElementById("equipamentos-estoque").textContent = total(estoque);
+                    document.getElementById("equipamentos-alocados").textContent = equipamentosAlocados;
+                    document.getElementById("total-linhas").textContent = total(linhas);
+                    document.getElementById("linhas-disponiveis").textContent = total(linhas) - linhasAlocadas;
+                    document.getElementById("linhas-alocadas").textContent = linhasAlocadas;
+                    document.getElementById("ocupacao-percentual").textContent = ocupacao + "%";
+                })
+                .catch(() => {
+                    document.querySelectorAll(".stat-number, .stat-detail b").forEach((el) => (el.textContent = "—"));
+                });
+        </script>
+    <script>
+const recentes = document.getElementById('colaboradores-recentes');
+fetch('../../data/colaboradores/ativos.json').then(r => r.json()).then(colaboradores => {
+    const lista = colaboradores.sort((a,b) => new Date(b.data_cadastro || b.data_atualizacao || 0) - new Date(a.data_cadastro || a.data_atualizacao || 0)).slice(0,6);
+    recentes.innerHTML = lista.length ? lista.map(c => '<article class="recent-item"><div class="recent-avatar"><i class="fas fa-user"></i></div><div class="recent-info"><strong>' + escapeHtml(c.nome || 'Sem nome') + '</strong><span>' + escapeHtml(c.cargo || c.departamento || 'Colaborador') + '</span></div><time>' + formatarData(c.data_cadastro || c.data_atualizacao) + '</time></article>').join('') : '<div class="recent-empty">Nenhum colaborador cadastrado.</div>';
+}).catch(() => { recentes.innerHTML = '<div class="recent-empty">Não foi possível carregar os colaboradores.</div>'; });
+function formatarData(valor){if(!valor)return 'Data não informada';const data=new Date(valor.replace(' ','T'));return Number.isNaN(data.getTime())?valor:data.toLocaleDateString('pt-BR');}
+function escapeHtml(valor){return String(valor).replace(/[&<>"']/g,c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 </script></body>
 </html>
