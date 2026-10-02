@@ -1,4 +1,10 @@
-<!doctype html>
+<?php
+session_start();
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: ../../index.php');
+    exit;
+}
+?><!doctype html>
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
@@ -181,6 +187,7 @@ function formatarData(valor){if(!valor)return 'Data não informada';const data=n
 function escapeHtml(valor){return String(valor).replace(/[&<>"']/g,c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 </script></body>
 </html>
+
 
 
 

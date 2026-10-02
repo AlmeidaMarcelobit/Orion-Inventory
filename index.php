@@ -6,7 +6,7 @@ $usuarios = json_decode(file_get_contents($usuariosArquivo), true) ?: [];
 $erro = '';
 
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: pages/dashbord/dashbord.html');
+    header('Location: pages/dashbord/dashbord.php');
     exit;
 }
 
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario_nome'] = $usuario['nome'];
             $_SESSION['usuario_nivel'] = $usuario['nivel'];
             $_SESSION['login_time'] = time();
-            header('Location: pages/dashbord/dashbord.html');
+            header('Location: pages/dashbord/dashbord.php');
             exit;
         }
     }
