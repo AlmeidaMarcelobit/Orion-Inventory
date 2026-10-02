@@ -7,7 +7,28 @@ $busca = trim($_GET['busca'] ?? '');
 $departamento = $_GET['departamento'] ?? 'todos';
 $bit = $_GET['bit'] ?? 'todos';
 $milvus = $_GET['milvus'] ?? 'todos';
+$acao = $_POST['acao'] ?? '';
+$arquivoInativos = dirname(__DIR__, 2) . '/data/colaboradores/inativos.json';
 $equipamentosAlocados = json_decode(file_get_contents(dirname(__DIR__, 2) . '/data/equipamentos/alocados.json'), true) ?: [];
+$contagemEquipamentos = [];
+foreach ($equipamentosAlocados as $equipamento) {
+    if (($equipamento['status'] ?? '') !== 'alocado' || empty($equipamento['colaborador_id'])) continue;
+    $idEquip = (string)$equipamento['colaborador_id'];
+    $contagemEquipamentos[$idEquip] = ($contagemEquipamentos[$idEquip] ?? 0) + 1;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $acao === 'inativar') {
+    $idInativar = (string)($_POST['id'] ?? '');
+    foreach ($colaboradores as $indice => $colaborador) {
+        if ((string)($colaborador['id'] ?? '') !== $idInativar) continue;
+        $inativos = json_decode(file_get_contents($arquivoInativos), true) ?: [];
+        $colaborador['data_inativacao'] = date('Y-m-d H:i:s');
+        $inativos[] = $colaborador; unset($colaboradores[$indice]);
+        file_put_contents($arquivo, json_encode(array_values($colaboradores), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        file_put_contents($arquivoInativos, json_encode($inativos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        header('Location: colaboradores.php'); exit;
+    }
+}
+
 $softwarePorColaborador = [];
 foreach ($equipamentosAlocados as $equipamento) {
     if (($equipamento['tipo'] ?? '') !== 'notebook' || empty($equipamento['colaborador_id'])) continue;
@@ -55,12 +76,17 @@ usort($colaboradores, fn($a,$b) => strcasecmp($a['nome'] ?? '', $b['nome'] ?? ''
 <a href="../../logout.php" class="sair-btn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
 </header>
 <main class="collaborators-page">
-<div class="page-title"><div><h1><i class="fas fa-users"></i> Colaboradores</h1><p>Gerencie os colaboradores cadastrados no sistema</p></div><span class="total-badge"><?php echo count($colaboradores); ?> encontrados</span></div>
-<section class="collaborators-filters"><form method="get"><div class="filter-search"><i class="fas fa-search"></i><input type="search" name="busca" value="<?php echo htmlspecialchars($busca); ?>" placeholder="Buscar por nome, CPF ou e-mail"></div><select name="departamento"><option value="todos">Todos os departamentos</option><?php foreach($departamentos as $dep): ?><option value="<?php echo htmlspecialchars($dep); ?>" <?php echo $departamento === $dep ? 'selected' : ''; ?>><?php echo htmlspecialchars($dep); ?></option><?php endforeach; ?></select><select name="bit"><option value="todos">Bit: todos</option><option value="sim" <?php echo $bit === 'sim' ? 'selected' : ''; ?>>Bit instalado</option><option value="nao" <?php echo $bit === 'nao' ? 'selected' : ''; ?>>Sem Bit</option></select><select name="milvus"><option value="todos">Milvus: todos</option><option value="sim" <?php echo $milvus === 'sim' ? 'selected' : ''; ?>>Milvus instalado</option><option value="nao" <?php echo $milvus === 'nao' ? 'selected' : ''; ?>>Sem Milvus</option></select><button class="filter-button" type="submit"><i class="fas fa-filter"></i> Filtrar</button><a class="clear-button" href="colaboradores.php"><i class="fas fa-rotate-left"></i></a></form></section>
-<section class="collaborators-card"><div class="table-heading"><h2><i class="fas fa-list"></i> Lista de colaboradores</h2></div><div class="collaborators-table-wrap"><table><thead><tr><th>Nome</th><th>Departamento</th><th>Cargo</th><th>E-mail</th><th>Tipo</th><th>Software</th><th>Ações</th></tr></thead><tbody><?php if(!$colaboradores): ?><tr><td colspan="7" class="empty-row">Nenhum colaborador encontrado.</td></tr><?php else: foreach($colaboradores as $c): ?><tr><td><strong><?php echo htmlspecialchars($c['nome'] ?? ''); ?></strong><small><?php echo htmlspecialchars($c['cpf'] ?? ''); ?></small></td><td><?php echo htmlspecialchars($c['departamento'] ?? '—'); ?></td><td><?php echo htmlspecialchars($c['cargo'] ?? '—'); ?></td><td><?php echo htmlspecialchars($c['email'] ?? '—'); ?></td><td><span class="work-badge"><?php echo ($c['tipo_trabalho'] ?? 'local') === 'home' ? 'Home Office' : 'Presencial'; ?></span></td><td><span class="<?php echo ($softwarePorColaborador[(string)($c['id'] ?? '')]['bit'] ?? false) ? 'software-on' : 'software-off'; ?>">Bit <?php echo ($softwarePorColaborador[(string)($c['id'] ?? '')]['bit'] ?? false) ? 'Sim' : 'Não'; ?></span><span class="<?php echo ($softwarePorColaborador[(string)($c['id'] ?? '')]['milvus'] ?? false) ? 'software-on' : 'software-off'; ?>">Milvus <?php echo ($softwarePorColaborador[(string)($c['id'] ?? '')]['milvus'] ?? false) ? 'Sim' : 'Não'; ?></span></td><td class="table-actions"><a href="editar.php?id=<?php echo urlencode($c['id']); ?>" class="edit-icon" title="Editar colaborador"><i class="fas fa-pen"></i></a></td></tr><?php endforeach; endif; ?></tbody></table></div></section>
+<div class="page-title"><div><h1><i class="fas fa-users"></i> Colaboradores</h1><p>Gerencie os colaboradores cadastrados no sistema</p></div><a class="add-collaborator" href="adicionar.php"><i class="fas fa-user-plus"></i> Adicionar colaborador</a></div>
+<section class="collaborators-filters"><form method="get"><div class="filter-search"><i class="fas fa-search"></i><input type="search" name="busca" value="<?php echo htmlspecialchars($busca); ?>" placeholder="Buscar por nome, CPF ou e-mail"></div><select name="departamento"><option value="todos">Todos os departamentos</option><?php foreach($departamentos as $dep): ?><option value="<?php echo htmlspecialchars($dep); ?>" <?php echo $departamento === $dep ? 'selected' : ''; ?>><?php echo htmlspecialchars($dep); ?></option><?php endforeach; ?></select><select name="bit"><option value="todos">Antivírus: todos</option><option value="sim" <?php echo $bit === 'sim' ? 'selected' : ''; ?>>Antivírus instalado</option><option value="nao" <?php echo $bit === 'nao' ? 'selected' : ''; ?>>Sem antivírus</option></select><button class="filter-button" type="submit"><i class="fas fa-filter"></i> Filtrar</button><a class="clear-button" href="colaboradores.php"><i class="fas fa-rotate-left"></i></a></form></section>
+<section class="collaborators-card"><div class="table-heading"><h2><i class="fas fa-list"></i> Lista de colaboradores</h2></div><div class="collaborators-table-wrap"><table><thead><tr><th>Nome</th><th>Departamento</th><th>Cargo</th><th>E-mail</th><th>Tipo</th><th>Software</th><th>Equipamentos</th><th>Ações</th></tr></thead><tbody><?php if(!$colaboradores): ?><tr><td colspan="8" class="empty-row">Nenhum colaborador encontrado.</td></tr><?php else: foreach($colaboradores as $c): ?><tr><td><strong><?php echo htmlspecialchars($c['nome'] ?? ''); ?></strong><small><?php echo htmlspecialchars(formatarCpf($c['cpf'] ?? '')); ?></small></td><td><?php echo htmlspecialchars($c['departamento'] ?? '—'); ?></td><td><?php echo htmlspecialchars($c['cargo'] ?? '—'); ?></td><td><?php echo htmlspecialchars($c['email'] ?? '—'); ?></td><td><span class="work-badge"><?php echo ($c['tipo_trabalho'] ?? 'local') === 'home' ? 'Home Office' : 'Presencial'; ?></span></td><td class="software-status"><span title="Antivírus"><i class="fas fa-<?php echo ($softwarePorColaborador[(string)($c['id'] ?? '')]['bit'] ?? false) ? 'check-circle status-ok' : 'times-circle status-no'; ?>"></i></span><span title="Milvus"><i class="fas fa-<?php echo ($softwarePorColaborador[(string)($c['id'] ?? '')]['milvus'] ?? false) ? 'check-circle status-ok' : 'times-circle status-no'; ?>"></i></span></td><td><span class="equipment-count"><i class="fas fa-laptop"></i> <?php echo $contagemEquipamentos[(string)($c['id'] ?? '')] ?? 0; ?></span></td><td class="table-actions"><a href="editar.php?id=<?php echo urlencode($c['id']); ?>" class="edit-icon" title="Editar colaborador"><i class="fas fa-pen"></i></a><form method="post" class="inline-action" onsubmit="return confirm('Inativar este colaborador?');"><input type="hidden" name="acao" value="inativar"><input type="hidden" name="id" value="<?php echo htmlspecialchars($c['id']); ?>"><button class="inactive-icon" title="Inativar colaborador" type="submit"><i class="fas fa-user-slash"></i></button></form></td></tr><?php endforeach; endif; ?></tbody></table></div></section>
 </main>
 <footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer>
 </body></html>
+
+
+
+
+
 
 
 
