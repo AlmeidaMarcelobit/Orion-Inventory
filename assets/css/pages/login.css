@@ -3,7 +3,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url("../../../../img/global/background/bg.jpg");
+    background: url("../../../img/global/background/bg.jpg");
     background-size: cover;
     background-position: center;
 }
@@ -19,8 +19,8 @@ body {
 }
 
 .container img {
-    width: 270px;
-    height: 100px;
+    width: 340px;
+    height: 130px;
     align-items: center;
 }
 .input-box {
