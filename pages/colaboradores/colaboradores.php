@@ -3,6 +3,10 @@ session_start();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 $arquivo = dirname(__DIR__, 2) . '/data/colaboradores/ativos.json';
 $colaboradores = json_decode(file_get_contents($arquivo), true) ?: [];
+function formatarCpf($cpf): string {
+    $numero = preg_replace('/\\D/', '', (string)$cpf);
+    return strlen($numero) === 11 ? substr($numero, 0, 3) . '.' . substr($numero, 3, 3) . '.' . substr($numero, 6, 3) . '-' . substr($numero, 9, 2) : ((string)$cpf ?: '—');
+}
 $busca = trim($_GET['busca'] ?? '');
 $departamento = $_GET['departamento'] ?? 'todos';
 $bit = $_GET['bit'] ?? 'todos';
@@ -82,6 +86,7 @@ usort($colaboradores, fn($a,$b) => strcasecmp($a['nome'] ?? '', $b['nome'] ?? ''
 </main>
 <footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer>
 </body></html>
+
 
 
 
