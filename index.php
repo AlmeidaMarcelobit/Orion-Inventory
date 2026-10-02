@@ -34,14 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="author" content="Marcelo Almeida">
     <title>Sistema Gestão Login</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon/favicon.ico">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/pages/login.css">
-    <link rel="icon" type="image/x-icon" href="img/favicon/favicon.ico">
+    <link rel="stylesheet" href="assets/css/global/import.css">
 </head>
 <body>
     <main class="container">
         <form method="post" action="" autocomplete="on">
-            <img src="img/pages/login/orion-title" alt="Orion Inventory">
+            <img src="img/global/logos/orion" alt="Orion Inventory">
             <?php if ($erro): ?>
                 <div class="login-error"><?php echo htmlspecialchars($erro); ?></div>
             <?php endif; ?>
