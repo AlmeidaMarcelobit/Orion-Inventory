@@ -14,6 +14,7 @@ $milvus = $_GET['milvus'] ?? 'todos';
 $tipoTrabalho = $_GET['tipo_trabalho'] ?? 'todos';
 $acao = $_POST['acao'] ?? '';
 $arquivoInativos = dirname(__DIR__, 2) . '/data/colaboradores/inativos.json';
+$arquivoPendencias = dirname(__DIR__, 2) . '/data/equipamentos/devolucoes_pendentes.json';
 $equipamentosAlocados = json_decode(file_get_contents(dirname(__DIR__, 2) . '/data/equipamentos/alocados.json'), true) ?: [];
 $contagemEquipamentos = [];
 foreach ($equipamentosAlocados as $equipamento) {
@@ -28,6 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $acao === 'inativar') {
         $inativos = json_decode(file_get_contents($arquivoInativos), true) ?: [];
         $colaborador['data_inativacao'] = date('Y-m-d H:i:s');
         $inativos[] = $colaborador; unset($colaboradores[$indice]);
+        $equipamentos = json_decode(file_get_contents(dirname(__DIR__, 2) . '/data/equipamentos/alocados.json'), true) ?: [];
+        $pendencias = file_exists($arquivoPendencias) ? (json_decode(file_get_contents($arquivoPendencias), true) ?: []) : [];
+        foreach ($equipamentos as &$equipamento) {
+            if ((string)($equipamento['colaborador_id'] ?? '') !== $idInativar || ($equipamento['status'] ?? '') !== 'alocado') continue;
+            $equipamento['status'] = 'pendente_devolucao';
+            $equipamento['data_pendencia_devolucao'] = date('Y-m-d H:i:s');
+            $equipamento['motivo_pendencia'] = 'Colaborador inativado';
+            $pendencias[] = $equipamento;
+        }
+        unset($equipamento);
+        file_put_contents(dirname(__DIR__, 2) . '/data/equipamentos/alocados.json', json_encode($equipamentos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        file_put_contents($arquivoPendencias, json_encode($pendencias, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
         file_put_contents($arquivo, json_encode(array_values($colaboradores), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
         file_put_contents($arquivoInativos, json_encode($inativos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
         header('Location: colaboradores.php'); exit;
@@ -89,6 +102,7 @@ usort($colaboradores, fn($a,$b) => strcasecmp($a['nome'] ?? '', $b['nome'] ?? ''
 </main>
 <footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer>
 </body></html>
+
 
 
 
