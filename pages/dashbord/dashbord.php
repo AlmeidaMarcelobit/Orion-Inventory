@@ -29,7 +29,7 @@ if (!isset($_SESSION['usuario_id'])) {
                         </a>
                     </li>
                     <li class="item-menu">
-                        <a href="">
+                        <a href="../colaboradores/colaboradores.php">
                             <span class="item"><i class="bi bi-person"></i></span>
                             <span class="txt-link">Colaboradores</span>
                         </a>
@@ -185,8 +185,24 @@ fetch('../../data/colaboradores/ativos.json').then(r => r.json()).then(colaborad
 }).catch(() => { recentes.innerHTML = '<div class="recent-empty">Não foi possível carregar os colaboradores.</div>'; });
 function formatarData(valor){if(!valor)return 'Data não informada';const data=new Date(valor.replace(' ','T'));return Number.isNaN(data.getTime())?valor:data.toLocaleDateString('pt-BR');}
 function escapeHtml(valor){return String(valor).replace(/[&<>"']/g,c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+</script><script>
+fetch('../../api/dashboard-data.php').then(response => { if (!response.ok) throw new Error('Não autenticado'); return response.json(); }).then(dados => {
+    document.getElementById('total-colaboradores').textContent = dados.colaboradores.total;
+    document.getElementById('colaboradores-home').textContent = dados.colaboradores.home;
+    document.getElementById('colaboradores-local').textContent = dados.colaboradores.local;
+    document.getElementById('total-equipamentos').textContent = dados.equipamentos.total;
+    document.getElementById('equipamentos-estoque').textContent = dados.equipamentos.estoque;
+    document.getElementById('equipamentos-alocados').textContent = dados.equipamentos.alocados;
+    document.getElementById('total-linhas').textContent = dados.linhas.total;
+    document.getElementById('linhas-disponiveis').textContent = dados.linhas.disponiveis;
+    document.getElementById('linhas-alocadas').textContent = dados.linhas.alocadas;
+    document.getElementById('ocupacao-percentual').textContent = dados.ocupacao + '%';
+    const recentes = document.getElementById('colaboradores-recentes');
+    recentes.innerHTML = dados.recentes.length ? dados.recentes.map(c => '<article class="recent-item"><div class="recent-avatar"><i class="fas fa-user"></i></div><div class="recent-info"><strong>' + escapeHtml(c.nome || 'Sem nome') + '</strong><span>' + escapeHtml(c.cargo || c.departamento || 'Colaborador') + '</span></div><time>' + formatarData(c.data_cadastro || c.data_atualizacao) + '</time></article>').join('') : '<div class="recent-empty">Nenhum colaborador cadastrado.</div>';
+}).catch(() => {});
 </script></body>
 </html>
+
 
 
 
