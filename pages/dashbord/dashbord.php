@@ -74,7 +74,7 @@ if (!isset($_SESSION['usuario_id'])) {
             <div class="usuario-menu">
                 <span class="usuario-nome"><i class="fas fa-user-shield"></i> Administrador</span>
             </div>
-            <a href="../../index.php" class="sair-btn">
+            <a href="../../logout.php" class="sair-btn">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>
             </a>
@@ -187,6 +187,7 @@ function formatarData(valor){if(!valor)return 'Data não informada';const data=n
 function escapeHtml(valor){return String(valor).replace(/[&<>"']/g,c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
 </script></body>
 </html>
+
 
 
 
