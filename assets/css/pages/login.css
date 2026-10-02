@@ -89,3 +89,4 @@ body {
     color: #fff;
     border: 2px solid rgba(0, 0, 0, 0.1);
 }
+.login-error { margin: -10px 0 15px; padding: 10px; border: 1px solid rgba(255,100,100,.6); border-radius: 8px; color: #fff; background: rgba(180,0,0,.25); font-size: 13px; text-align: center; }
