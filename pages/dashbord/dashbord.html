@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="../../assets/css/global/import.css" />
     </head>
     <body>
+       <header>
         <nav class="menu-lateral">
            <img src="" alt="">
             <div class="btn-expandir">
@@ -57,8 +58,70 @@
                 </li>
             </ul>
         </nav>
-        <main>
+                <div class="logo">
+            <a href="index.php">
+                <img src="" alt="">
+            </a>
+        </div>
+         <div class="user-menu">
+             <span class="user-name">Administrador</span>
+           </div>
+           <a href="logout.php" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </header>
+        <main class="grid-cards">
+            <div>
+                <div class="stat-card">
+            <div class="stat-icon primary"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+                <h3>Colaboradores</h3>
+                <p class="stat-number">324</p>
+                <div class="stat-detail">
+                    <span><i class="fas fa-home"></i> Home: 51</span>
+                    <span><i class="fas fa-building"></i> Local: 273</span>
+                </div>
+            </div>
+             <div class="stat-card">
+            <div class="stat-icon success"><i class="fas fa-laptop"></i></div>
+            <div class="stat-content">
+                <h3>Equipamentos</h3>
+                <p class="stat-number">701</p>
+                <div class="stat-detail">
+                    <span><i class="fas fa-warehouse"></i> Estoque: 27</span>
+                    <span><i class="fas fa-user-check"></i> Alocados: 607</span>
+                </div>
+            </div>
+        </div>
+         <div class="stat-card">
+            <div class="stat-icon info"><i class="fas fa-phone"></i></div>
+            <div class="stat-content">
+                <h3>Linhas</h3>
+                <p class="stat-number">264</p>
+                <div class="stat-detail">
+                    <span><i class="fas fa-check-circle"></i> Disp.: 110</span>
+                    <span><i class="fas fa-user-check"></i> Aloc.: 141</span>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon warning"><i class="fas fa-chart-pie"></i></div>
+            <div class="stat-content">
+                <h3>Ocupação</h3>
+                <p class="stat-number">87%</p>
+                <div class="stat-detail">
+                    <span><i class="fas fa-chart-line"></i> Utilização</span>
+                </div>
+            </div>
+        </div>
+        </div>
+            </div>
             
+            <!-- Últimos Colaboradores -->
         </main>
+        <footer>
+            <p> Orion Inventory &copy; 2023 - 2026 - Todos os direitos reservados</p>
+        </footer>
     </body>
 </html>
