@@ -255,3 +255,5 @@ footer{margin-left:0;margin-top:auto;padding:22px 30px;background:linear-gradien
 
 
 
+
+.usuario-nome{display:inline-flex;align-items:center;gap:7px;font-size:13px!important}.usuario-nome i{color:var(--orion-pink);font-size:15px}
