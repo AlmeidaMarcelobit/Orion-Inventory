@@ -1,0 +1,42 @@
+.equipment-page { flex: 1; width: min(1280px, calc(100% - 56px)); margin: 38px auto; }
+.equipment-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.equipment-heading h1 { font-size: 28px; }
+.equipment-heading h1 i, .equipment-filters h2 i { color: var(--orion-pink); }
+.equipment-heading p { margin-top: 7px; font-size: 14px; color: var(--orion-muted); }
+.equipment-primary, .equipment-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 10px 16px; border: 1px solid transparent; border-radius: 10px; background: var(--orion-pink); color: #fff; font: inherit; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.equipment-primary:hover { filter: brightness(.92); }
+.equipment-secondary { background: #fff; color: var(--orion-muted); border-color: var(--orion-border); }
+.equipment-filters, .equipment-form-panel { margin-bottom: 24px; padding: 22px; background: #fff; border: 1px solid var(--orion-border); border-radius: 16px; }
+.equipment-filters h2, .equipment-form-panel h2, .equipment-list h2 { margin-bottom: 16px; font-size: 17px; }
+.equipment-filters form { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; }
+.equipment-page label { display: flex; flex-direction: column; gap: 7px; color: var(--orion-muted); font-size: 12px; }
+.equipment-filters label { flex: 1; min-width: 150px; }
+.equipment-page input, .equipment-page select, .equipment-page textarea { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid var(--orion-border); border-radius: 9px; background: #fff; color: var(--orion-text); font: inherit; font-size: 13px; }
+.equipment-page :is(a, button, input, select, textarea):focus-visible { outline: 2px solid var(--orion-pink); outline-offset: 3px; }
+.equipment-list-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.equipment-list-heading h2 { margin: 0; }
+.equipment-list-heading > span { color: var(--orion-muted); font-size: 12px; }
+.equipment-row { display: grid; grid-template-columns: 86px .8fr 1.2fr 1.1fr 1.4fr 120px; align-items: center; gap: 18px; margin-bottom: 14px; padding: 18px; border: 1px solid var(--orion-border); border-radius: 16px; background: #fff; }
+.equipment-icon { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 78px; border-radius: 12px; background: #fff0f7; color: var(--orion-pink); }
+.equipment-icon i { font-size: 27px; }
+.equipment-icon span { font-size: 10px; }
+.equipment-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+.equipment-field > span, .equipment-field small { color: var(--orion-muted); font-size: 11px; }
+.equipment-field strong { font-size: 13px; font-weight: 600; }
+.equipment-field .equipment-status { align-self: start; padding: 5px 9px; border-radius: 999px; background: #f1f2f4; color: #525965; }
+.equipment-field .equipment-status-alocado { background: #e8f1ff; color: #2374e1; }
+.equipment-field .equipment-status-estoque { background: #e8f8ef; color: #238654; }
+.equipment-field .equipment-status-emprestado, .equipment-field .equipment-status-manutencao, .equipment-field .equipment-status-pendente_devolucao { background: #fff3d9; color: #8a5b00; }
+.equipment-actions { display: flex; flex-direction: column; gap: 7px; }
+.equipment-action { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 34px; padding: 8px; border: 0; border-radius: 8px; background: #e8f1ff; color: #2374e1; font: inherit; font-size: 11px; text-decoration: none; cursor: pointer; }
+.equipment-unlink { background: #fff3d9; color: #8a5b00; }
+.equipment-action:hover { filter: brightness(.94); }
+.equipment-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.equipment-form-wide { grid-column: 1 / -1; }
+.equipment-form-actions { display: flex; gap: 10px; }
+.equipment-notice { margin-bottom: 18px; padding: 14px 18px; border-radius: 10px; background: #e8f8ef; color: #238654; font-size: 13px; }
+.equipment-error { background: #fff0f0; color: #a72c2c; }
+.equipment-empty { padding: 48px; border: 1px solid var(--orion-border); border-radius: 16px; background: #fff; text-align: center; color: var(--orion-muted); }
+.equipment-empty i { margin-bottom: 12px; font-size: 30px; }
+@media (max-width: 1100px) { .equipment-row { grid-template-columns: 76px repeat(2, minmax(0, 1fr)); } .equipment-icon { grid-row: span 2; } .equipment-actions { flex-direction: row; grid-column: 1 / -1; justify-content: end; } .equipment-actions > a, .equipment-actions form { width: 120px; } }
+@media (max-width: 700px) { .equipment-page { width: calc(100% - 28px); margin: 24px auto; } .equipment-heading { align-items: start; flex-direction: column; } .equipment-heading h1 { font-size: 24px; } .equipment-form { grid-template-columns: 1fr; } .equipment-row { gap: 12px; padding: 14px; grid-template-columns: 64px minmax(0, 1fr); } .equipment-icon { grid-row: span 4; } .equipment-list-heading { align-items: start; flex-direction: column; } .equipment-filters, .equipment-form-panel { padding: 16px; } }

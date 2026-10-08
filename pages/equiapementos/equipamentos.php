@@ -1,0 +1,204 @@
+<?php
+session_start();
+if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
+date_default_timezone_set('America/Sao_Paulo');
+$base = dirname(__DIR__, 2);
+$fontes = ['alocado' => 'alocados', 'emprestado' => 'emprestados', 'estoque' => 'estoque', 'fora_uso' => 'fora_uso', 'interno' => 'internos', 'manutencao' => 'manutencao'];
+$statusNomes = ['alocado' => 'Alocado', 'emprestado' => 'Emprestado', 'estoque' => 'Em estoque', 'fora_uso' => 'Fora de uso', 'interno' => 'Uso interno', 'manutencao' => 'Em manutenção', 'pendente_devolucao' => 'Devolução pendente'];
+$icones = ['notebook' => 'laptop', 'desktop' => 'desktop', 'monitor' => 'display', 'fone' => 'headphones', 'mouse' => 'computer-mouse', 'teclado' => 'keyboard', 'tv' => 'tv', 'celular' => 'mobile-screen'];
+function h($valor): string { return htmlspecialchars((string)($valor ?? ''), ENT_QUOTES, 'UTF-8'); }
+function lerLista(string $arquivo): array {
+    $conteudo = file_get_contents($arquivo);
+    if ($conteudo === false) throw new RuntimeException('Não foi possível ler os dados.');
+    $dados = json_decode($conteudo, true, 512, JSON_THROW_ON_ERROR);
+    if (!is_array($dados) || array_values($dados) !== $dados) throw new RuntimeException('Formato de dados inválido.');
+    return $dados;
+}
+function carregarEquipamentos(string $base, array $fontes): array {
+    $listas = [];
+    foreach ($fontes as $nome) $listas[$nome] = lerLista($base . '/data/equipamentos/' . $nome . '.json');
+    return $listas;
+}
+$_SESSION['equipamentos_csrf'] ??= bin2hex(random_bytes(32));
+$erro = '';
+$listas = [];
+$pessoas = [];
+$ativos = [];
+try {
+    foreach (['ativos', 'inativos', 'terceiros'] as $grupo) {
+        foreach (lerLista($base . '/data/colaboradores/' . $grupo . '.json') as $pessoa) {
+            $pessoas[(string)$pessoa['id']] = $pessoa;
+            if ($grupo !== 'inativos') $ativos[(string)$pessoa['id']] = $pessoa;
+        }
+    }
+    $listas = carregarEquipamentos($base, $fontes);
+} catch (Throwable $e) { $erro = 'Não foi possível carregar os arquivos de dados. Verifique os JSON da pasta /data.'; }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
+    $lock = null;
+    try {
+        if (!hash_equals($_SESSION['equipamentos_csrf'], (string)($_POST['csrf'] ?? ''))) throw new RuntimeException('Sessão inválida. Atualize a página e tente novamente.');
+        $lock = fopen($base . '/data/equipamentos/.equipamentos.lock', 'c');
+        if (!$lock || !flock($lock, LOCK_EX)) throw new RuntimeException('Não foi possível acessar os dados para gravação.');
+        $listas = carregarEquipamentos($base, $fontes);
+        $originais = $listas;
+        $acao = (string)($_POST['acao'] ?? '');
+        $origem = (string)($_POST['origem'] ?? '');
+        $id = (string)($_POST['id'] ?? '');
+        $indice = null;
+        if ($acao !== 'adicionar') {
+            if (!in_array($origem, $fontes, true)) throw new RuntimeException('Origem inválida.');
+            foreach ($listas[$origem] as $i => $item) if ((string)($item['id'] ?? '') === $id) { $indice = $i; break; }
+            if ($indice === null) throw new RuntimeException('Equipamento não encontrado. Atualize a página.');
+            $item = $listas[$origem][$indice];
+        } else {
+            $maiorId = 0;
+            foreach ($listas as $lista) foreach ($lista as $registro) $maiorId = max($maiorId, (int)($registro['id'] ?? 0));
+            $item = ['id' => $maiorId + 1, 'status' => 'estoque', 'colaborador_id' => null, 'especificacoes' => null, 'data_cadastro' => date('Y-m-d H:i:s'), 'data_atribuicao' => null, 'tipo_atribuicao' => null];
+        }
+        $destino = $origem;
+        if (in_array($acao, ['adicionar', 'editar'], true)) {
+            foreach (['tipo', 'marca', 'modelo', 'patrimonio', 'serial', 'hostname', 'centro_custo', 'observacoes'] as $campo) {
+                $valor = trim((string)($_POST[$campo] ?? ''));
+                if (strlen($valor) > 5000) throw new RuntimeException('Um dos campos excede o limite permitido.');
+                $item[$campo] = $valor === '' ? null : $valor;
+            }
+            foreach (['tipo', 'marca', 'modelo', 'patrimonio'] as $campo) if (empty($item[$campo])) throw new RuntimeException('Preencha tipo, marca, modelo e patrimônio.');
+            foreach ($listas as $nome => $lista) foreach ($lista as $i => $registro) {
+                if ($acao === 'editar' && $nome === $origem && $i === $indice) continue;
+                if (strcasecmp((string)($registro['patrimonio'] ?? ''), $item['patrimonio']) === 0) throw new RuntimeException('Este patrimônio já está cadastrado.');
+                if ($item['serial'] && strcasecmp((string)($registro['serial'] ?? ''), $item['serial']) === 0) throw new RuntimeException('Este serial já está cadastrado.');
+            }
+            if ($acao === 'adicionar') $destino = 'estoque';
+        } elseif ($acao === 'alocar') {
+            if (($item['status'] ?? '') !== 'estoque' || !empty($item['colaborador_id'])) throw new RuntimeException('Somente equipamentos disponíveis em estoque podem ser alocados.');
+            $colaboradorId = (string)($_POST['colaborador_id'] ?? '');
+            if (!isset($ativos[$colaboradorId])) throw new RuntimeException('Selecione um colaborador ativo.');
+            $item['colaborador_id'] = $ativos[$colaboradorId]['id'];
+            $item['colaborador_nome'] = $ativos[$colaboradorId]['nome'];
+            $item['centro_custo'] = $ativos[$colaboradorId]['centro_custo'] ?? $item['centro_custo'] ?? null;
+            $item['status'] = 'alocado';
+            $item['data_atribuicao'] = date('Y-m-d H:i:s');
+            $item['tipo_atribuicao'] = 'alocacao';
+            $destino = 'alocados';
+        } elseif ($acao === 'desvincular') {
+            if (!in_array($item['status'] ?? '', ['alocado', 'emprestado'], true) || empty($item['colaborador_id'])) throw new RuntimeException('Este equipamento não possui vínculo disponível para remoção.');
+            $item['observacoes'] = trim(($item['observacoes'] ?? '') . "\n[DEVOLUÇÃO] " . date('d/m/Y H:i:s') . ' — Colaborador: ' . ($pessoas[(string)$item['colaborador_id']]['nome'] ?? $item['colaborador_nome'] ?? $item['colaborador_id']) . ' — Destino: Em estoque');
+            $item['colaborador_id'] = null;
+            $item['colaborador_nome'] = null;
+            $item['status'] = 'estoque';
+            $item['data_atribuicao'] = null;
+            $item['tipo_atribuicao'] = null;
+            $destino = 'estoque';
+        } else { throw new RuntimeException('Ação inválida.'); }
+        $item['data_atualizacao'] = date('Y-m-d H:i:s');
+        if ($indice !== null) array_splice($listas[$origem], $indice, 1);
+        $listas[$destino][] = $item;
+        $gravados = [];
+        try {
+            foreach ($listas as $nome => $lista) {
+                if ($lista === $originais[$nome]) continue;
+                $arquivo = $base . '/data/equipamentos/' . $nome . '.json';
+                $json = json_encode($lista, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+                $gravados[] = $nome;
+                if (file_put_contents($arquivo, $json, LOCK_EX) !== strlen($json)) throw new RuntimeException('Não foi possível salvar os dados.');
+            }
+        } catch (Throwable $e) {
+            foreach ($gravados as $nome) file_put_contents($base . '/data/equipamentos/' . $nome . '.json', json_encode($originais[$nome], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+            throw $e;
+        }
+        $_SESSION['equipamentos_mensagem'] = 'Equipamento ' . ['adicionar' => 'adicionado', 'editar' => 'atualizado', 'alocar' => 'alocado', 'desvincular' => 'desvinculado'][$acao] . ' com sucesso.';
+        flock($lock, LOCK_UN); fclose($lock);
+        header('Location: equipamentos.php'); exit;
+    } catch (Throwable $e) {
+        $erro = $e instanceof RuntimeException ? $e->getMessage() : 'Não foi possível salvar o equipamento.';
+        if (is_resource($lock)) { flock($lock, LOCK_UN); fclose($lock); }
+        $listas = $originais ?? $listas;
+    }
+}
+$equipamentos = [];
+foreach ($listas as $origem => $lista) foreach ($lista as $item) { $item['_origem'] = $origem; $equipamentos[] = $item; }
+$tipos = array_values(array_unique(array_filter(array_column($equipamentos, 'tipo')))); sort($tipos);
+$filtros = [];
+foreach (['tipo', 'status', 'patrimonio', 'serial'] as $campo) $filtros[$campo] = trim((string)($_GET[$campo] ?? ''));
+$exibidos = array_values(array_filter($equipamentos, function ($item) use ($filtros) {
+    foreach ($filtros as $campo => $valor) {
+        if ($valor === '') continue;
+        if (in_array($campo, ['tipo', 'status'], true)) { if (($item[$campo] ?? '') !== $valor) return false; }
+        elseif (stripos((string)($item[$campo] ?? ''), $valor) === false) return false;
+    }
+    return true;
+}));
+usort($exibidos, fn($a, $b) => strnatcasecmp((string)($a['patrimonio'] ?? ''), (string)($b['patrimonio'] ?? '')));
+$acaoForm = (string)($_GET['acao'] ?? '');
+$selecionado = null;
+foreach ($equipamentos as $item) if ((string)($item['id'] ?? '') === (string)($_GET['id'] ?? '') && $item['_origem'] === ($_GET['origem'] ?? '')) { $selecionado = $item; break; }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $erro) { $acaoForm = (string)($_POST['acao'] ?? ''); $selecionado = $_POST; }
+$mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamentos_mensagem']);
+?>
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equipamentos - Orion Inventory</title>
+<link rel="stylesheet" href="../../assets/css/global/import.css">
+<link rel="stylesheet" href="../../assets/css/pages/dashboard.css">
+<link rel="stylesheet" href="../../assets/css/pages/equipamentos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="../../assets/js/equipamentos.js" defer></script>
+</head>
+<body>
+<header>
+<nav class="menu-lateral"><div class="btn-expandir"><i class="bi bi-card-list"></i></div><ul>
+<li class="item-menu"><a href="../dashbord/dashbord.php"><span class="item"><i class="bi bi-columns-gap"></i></span><span class="txt-link">Dashboard</span></a></li>
+<li class="item-menu"><a href="../colaboradores/colaboradores.php"><span class="item"><i class="bi bi-person"></i></span><span class="txt-link">Colaboradores</span></a></li>
+<li class="item-menu active"><a href="equipamentos.php" aria-current="page"><span class="item"><i class="bi bi-pc-display-horizontal"></i></span><span class="txt-link">Equipamentos</span></a></li>
+<li class="item-menu"><a href="#"><span class="item"><i class="bi bi-sd-card"></i></span><span class="txt-link">Linhas</span></a></li>
+<li class="item-menu"><a href="#"><span class="item"><i class="bi bi-file-earmark-pdf"></i></span><span class="txt-link">Termos</span></a></li>
+<li class="item-menu"><a href="#"><span class="item"><i class="bi bi-tools"></i></span><span class="txt-link">Manutenção</span></a></li>
+<li class="item-menu"><a href="#"><span class="item"><i class="bi bi-person-circle"></i></span><span class="txt-link">Usuários</span></a></li>
+</ul></nav>
+<div class="logo"><a href="../dashbord/dashbord.php"><img src="../../img/global/logos/orion" alt="Orion Inventory"></a></div>
+<div class="usuario-menu"><span class="usuario-nome"><i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário'); ?></span></div>
+<a href="../../logout.php" class="sair-btn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+</header>
+<main class="equipment-page">
+<div class="equipment-heading"><div><h1><i class="fas fa-laptop" aria-hidden="true"></i> Equipamentos</h1><p>Gerencie o inventário e a alocação dos equipamentos.</p></div><a class="equipment-primary" href="?acao=adicionar"><i class="fas fa-plus" aria-hidden="true"></i> Adicionar equipamento</a></div>
+<?php if ($erro): ?><p class="equipment-notice equipment-error" role="alert"><?= h($erro) ?></p><?php endif; ?>
+<?php if ($mensagem): ?><p class="equipment-notice" role="status"><?= h($mensagem) ?></p><?php endif; ?>
+<?php if (in_array($acaoForm, ['adicionar', 'editar', 'alocar'], true) && ($acaoForm === 'adicionar' || $selecionado)): $registro = $selecionado ?? []; ?>
+<section class="equipment-form-panel"><h2><?= ['adicionar' => 'Adicionar equipamento', 'editar' => 'Editar equipamento', 'alocar' => 'Alocar equipamento'][$acaoForm] ?></h2>
+<form method="post" class="equipment-form">
+<input type="hidden" name="csrf" value="<?= h($_SESSION['equipamentos_csrf']) ?>"><input type="hidden" name="acao" value="<?= h($acaoForm) ?>"><input type="hidden" name="id" value="<?= h($registro['id'] ?? '') ?>"><input type="hidden" name="origem" value="<?= h($registro['_origem'] ?? $registro['origem'] ?? '') ?>">
+<?php if ($acaoForm === 'alocar'): ?>
+<p class="equipment-form-wide"><?= h(($registro['marca'] ?? '') . ' ' . ($registro['modelo'] ?? '') . ' · Patrimônio ' . ($registro['patrimonio'] ?? '')) ?></p>
+<label class="equipment-form-wide">Colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>"><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
+<?php else: ?>
+<?php foreach (['tipo' => 'Tipo', 'marca' => 'Marca', 'modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial', 'hostname' => 'Hostname', 'centro_custo' => 'Centro de custo'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h($registro[$campo] ?? '') ?>" maxlength="255" <?= in_array($campo, ['tipo', 'marca', 'modelo', 'patrimonio'], true) ? 'required' : '' ?> <?= $campo === 'tipo' ? 'list="equipment-types"' : '' ?>></label><?php endforeach; ?>
+<datalist id="equipment-types"><?php foreach ($tipos as $tipo): ?><option value="<?= h($tipo) ?>"><?php endforeach; ?></datalist>
+<label class="equipment-form-wide">Observações<textarea name="observacoes" rows="3" maxlength="5000"><?= h($registro['observacoes'] ?? '') ?></textarea></label>
+<?php endif; ?>
+<div class="equipment-form-wide equipment-form-actions"><button class="equipment-primary" type="submit">Salvar</button><a class="equipment-secondary" href="equipamentos.php">Cancelar</a></div>
+</form></section>
+<?php endif; ?>
+<section class="equipment-filters" aria-label="Filtros de equipamentos"><h2><i class="fas fa-filter" aria-hidden="true"></i> Filtros</h2><form method="get">
+<label>Tipo<select name="tipo"><option value="">Todos os tipos</option><?php foreach ($tipos as $tipo): ?><option value="<?= h($tipo) ?>" <?= $filtros['tipo'] === $tipo ? 'selected' : '' ?>><?= h(ucfirst($tipo)) ?></option><?php endforeach; ?></select></label>
+<label>Status<select name="status"><option value="">Todos os status</option><?php foreach ($statusNomes as $valor => $rotulo): ?><option value="<?= h($valor) ?>" <?= $filtros['status'] === $valor ? 'selected' : '' ?>><?= $rotulo ?></option><?php endforeach; ?></select></label>
+<label>Patrimônio<input name="patrimonio" placeholder="Buscar patrimônio" value="<?= h($filtros['patrimonio']) ?>"></label>
+<label>Serial<input name="serial" placeholder="Buscar serial" value="<?= h($filtros['serial']) ?>"></label>
+<button class="equipment-primary" type="submit">Filtrar</button><a class="equipment-secondary" href="equipamentos.php">Limpar</a>
+</form></section>
+<section class="equipment-list" aria-label="Lista de equipamentos"><div class="equipment-list-heading"><h2>Lista de equipamentos</h2><span><?= count($exibidos) ?> de <?= count($equipamentos) ?> equipamentos</span></div>
+<?php if (!$exibidos): ?><div class="equipment-empty"><i class="fas fa-box-open" aria-hidden="true"></i><p>Nenhum equipamento encontrado.</p></div><?php endif; ?>
+<?php foreach ($exibidos as $item): $status = $item['status'] ?? ''; $pessoaId = (string)($item['colaborador_id'] ?? ''); $nome = $pessoas[$pessoaId]['nome'] ?? $item['colaborador_nome'] ?? ($pessoaId !== '' ? 'Colaborador #' . $pessoaId : 'Sem alocação'); $query = http_build_query(['id' => $item['id'], 'origem' => $item['_origem']]); ?>
+<article class="equipment-row"><div class="equipment-icon"><i class="fas fa-<?= h($icones[$item['tipo'] ?? ''] ?? 'computer') ?>" aria-hidden="true"></i><span><?= h(ucfirst($item['tipo'] ?? 'Equipamento')) ?></span></div>
+<div class="equipment-field"><span>Marca</span><strong><?= h($item['marca'] ?? '—') ?></strong></div><div class="equipment-field equipment-model"><span>Modelo</span><strong><?= h($item['modelo'] ?? '—') ?></strong></div>
+<div class="equipment-field"><span>Patrimônio</span><strong><?= h($item['patrimonio'] ?? '—') ?></strong><small>Serial: <?= h($item['serial'] ?? '—') ?></small></div>
+<div class="equipment-field equipment-allocation"><span class="equipment-status equipment-status-<?= h(array_key_exists($status, $statusNomes) ? $status : 'outro') ?>"><?= h($statusNomes[$status] ?? $status) ?></span><strong><?= h($nome) ?></strong></div>
+<div class="equipment-actions"><a class="equipment-action" href="?acao=editar&amp;<?= h($query) ?>" aria-label="Editar equipamento <?= h($item['patrimonio']) ?>"><i class="fas fa-pen" aria-hidden="true"></i> Editar</a>
+<?php if ($status === 'estoque' && !$pessoaId): ?><a class="equipment-action" href="?acao=alocar&amp;<?= h($query) ?>"><i class="fas fa-user-plus" aria-hidden="true"></i> Alocar</a><?php elseif (in_array($status, ['alocado', 'emprestado'], true) && $pessoaId): ?>
+<form method="post" data-confirm="Desvincular este equipamento e devolvê-lo ao estoque?"><input type="hidden" name="csrf" value="<?= h($_SESSION['equipamentos_csrf']) ?>"><input type="hidden" name="acao" value="desvincular"><input type="hidden" name="id" value="<?= h($item['id']) ?>"><input type="hidden" name="origem" value="<?= h($item['_origem']) ?>"><button class="equipment-action equipment-unlink" type="submit"><i class="fas fa-link-slash" aria-hidden="true"></i> Desvincular</button></form>
+<?php endif; ?></div></article>
+<?php endforeach; ?></section>
+</main>
+<footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer>
+</body></html>
