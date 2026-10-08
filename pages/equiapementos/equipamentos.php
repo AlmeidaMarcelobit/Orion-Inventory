@@ -53,11 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
         } else {
             $maiorId = 0;
             foreach ($listas as $lista) foreach ($lista as $registro) $maiorId = max($maiorId, (int)($registro['id'] ?? 0));
-            $item = ['id' => $maiorId + 1, 'status' => 'estoque', 'colaborador_id' => null, 'especificacoes' => null, 'data_cadastro' => date('Y-m-d H:i:s'), 'data_atribuicao' => null, 'tipo_atribuicao' => null];
+            $item = ['id' => $maiorId + 1, 'status' => 'estoque', 'centro_custo' => '11001', 'colaborador_id' => null, 'especificacoes' => null, 'data_cadastro' => date('Y-m-d H:i:s'), 'data_atribuicao' => null, 'tipo_atribuicao' => null];
         }
         $destino = $origem;
         if (in_array($acao, ['adicionar', 'editar'], true)) {
-            foreach (['tipo', 'marca', 'modelo', 'patrimonio', 'serial', 'hostname', 'centro_custo', 'observacoes'] as $campo) {
+            foreach (['tipo', 'marca', 'modelo', 'patrimonio', 'serial', 'hostname', 'observacoes'] as $campo) {
                 $valor = trim((string)($_POST[$campo] ?? ''));
                 if (strlen($valor) > 5000) throw new RuntimeException('Um dos campos excede o limite permitido.');
                 $item[$campo] = $valor === '' ? null : $valor;
@@ -73,9 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             if (($item['status'] ?? '') !== 'estoque' || !empty($item['colaborador_id'])) throw new RuntimeException('Somente equipamentos disponíveis em estoque podem ser alocados.');
             $colaboradorId = (string)($_POST['colaborador_id'] ?? '');
             if (!isset($ativos[$colaboradorId])) throw new RuntimeException('Selecione um colaborador ativo.');
+            $centroCusto = trim((string)($ativos[$colaboradorId]['centro_custo'] ?? ''));
+            if ($centroCusto === '') throw new RuntimeException('O colaborador selecionado não possui centro de custo cadastrado.');
             $item['colaborador_id'] = $ativos[$colaboradorId]['id'];
             $item['colaborador_nome'] = $ativos[$colaboradorId]['nome'];
-            $item['centro_custo'] = $ativos[$colaboradorId]['centro_custo'] ?? $item['centro_custo'] ?? null;
+            $item['centro_custo'] = $centroCusto;
             $item['status'] = 'alocado';
             $item['data_atribuicao'] = date('Y-m-d H:i:s');
             $item['tipo_atribuicao'] = 'alocacao';
@@ -86,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             $item['colaborador_id'] = null;
             $item['colaborador_nome'] = null;
             $item['status'] = 'estoque';
+            $item['centro_custo'] = '11001';
             $item['data_atribuicao'] = null;
             $item['tipo_atribuicao'] = null;
             $destino = 'estoque';
@@ -173,7 +176,7 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <p class="equipment-form-wide"><?= h(($registro['marca'] ?? '') . ' ' . ($registro['modelo'] ?? '') . ' · Patrimônio ' . ($registro['patrimonio'] ?? '')) ?></p>
 <label class="equipment-form-wide">Colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>"><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <?php else: ?>
-<?php foreach (['tipo' => 'Tipo', 'marca' => 'Marca', 'modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial', 'hostname' => 'Hostname', 'centro_custo' => 'Centro de custo'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h($registro[$campo] ?? '') ?>" maxlength="255" <?= in_array($campo, ['tipo', 'marca', 'modelo', 'patrimonio'], true) ? 'required' : '' ?> <?= $campo === 'tipo' ? 'list="equipment-types"' : '' ?>></label><?php endforeach; ?>
+<?php foreach (['tipo' => 'Tipo', 'marca' => 'Marca', 'modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial', 'hostname' => 'Hostname'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h($registro[$campo] ?? '') ?>" maxlength="255" <?= in_array($campo, ['tipo', 'marca', 'modelo', 'patrimonio'], true) ? 'required' : '' ?> <?= $campo === 'tipo' ? 'list="equipment-types"' : '' ?>></label><?php endforeach; ?>
 <datalist id="equipment-types"><?php foreach ($tipos as $tipo): ?><option value="<?= h($tipo) ?>"><?php endforeach; ?></datalist>
 <label class="equipment-form-wide">Observações<textarea name="observacoes" rows="3" maxlength="5000"><?= h($registro['observacoes'] ?? '') ?></textarea></label>
 <?php endif; ?>
