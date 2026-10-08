@@ -86,7 +86,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
                 if (strcasecmp((string)($registro['patrimonio'] ?? ''), $item['patrimonio']) === 0) throw new RuntimeException('Este patrimônio já está cadastrado.');
                 if ($item['serial'] && strcasecmp((string)($registro['serial'] ?? ''), $item['serial']) === 0) throw new RuntimeException('Este serial já está cadastrado.');
             }
-            if ($acao === 'adicionar') $destino = 'estoque';
+            if ($acao === 'adicionar') {
+                $statusCadastro = (string)($_POST['status'] ?? 'estoque');
+                if (!in_array($statusCadastro, ['alocado', 'fora_uso', 'estoque', 'interno'], true)) throw new RuntimeException('Selecione um status permitido para o cadastro.');
+                $item['status'] = $statusCadastro;
+                $destino = $fontes[$statusCadastro];
+                if ($statusCadastro === 'alocado') {
+                    $colaboradorId = (string)($_POST['colaborador_id'] ?? '');
+                    if (!isset($ativos[$colaboradorId])) throw new RuntimeException('Selecione um colaborador ativo para cadastrar o equipamento alocado.');
+                    $centroCusto = trim((string)($ativos[$colaboradorId]['centro_custo'] ?? ''));
+                    if ($centroCusto === '') throw new RuntimeException('O colaborador selecionado não possui centro de custo cadastrado.');
+                    $item['colaborador_id'] = $ativos[$colaboradorId]['id'];
+                    $item['colaborador_nome'] = $ativos[$colaboradorId]['nome'];
+                    $item['centro_custo'] = $centroCusto;
+                    $item['data_atribuicao'] = date('Y-m-d H:i:s');
+                    $item['tipo_atribuicao'] = 'alocacao';
+                }
+            }
         } elseif ($acao === 'alocar') {
             if (($item['status'] ?? '') !== 'estoque' || !empty($item['colaborador_id'])) throw new RuntimeException('Somente equipamentos disponíveis em estoque podem ser alocados.');
             $colaboradorId = (string)($_POST['colaborador_id'] ?? '');
@@ -202,8 +218,12 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <input type="hidden" name="csrf" value="<?= h($_SESSION['equipamentos_csrf']) ?>"><input type="hidden" name="acao" value="<?= h($acaoForm) ?>"><input type="hidden" name="id" value="<?= h($registro['id'] ?? '') ?>"><input type="hidden" name="origem" value="<?= h($registro['_origem'] ?? $registro['origem'] ?? '') ?>">
 <?php if ($acaoForm === 'alocar'): ?>
 <p class="equipment-form-wide"><?= h(($registro['marca'] ?? '') . ' ' . ($registro['modelo'] ?? '') . ' · Patrimônio ' . ($registro['patrimonio'] ?? '')) ?></p>
-<label class="equipment-form-wide">Colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>"><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
+<label class="equipment-form-wide equipment-collaborator-field" data-collaborator-combobox>Colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>"><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <?php else: ?>
+<?php if ($acaoForm === 'adicionar'): $statusForm = (string)($registro['status'] ?? 'estoque'); ?>
+<label>Status<select name="status" class="equipment-type-select" data-equipment-status required><?php foreach (['estoque' => 'Inventário', 'alocado' => 'Alocado', 'fora_uso' => 'Fora de uso', 'interno' => 'Interno'] as $valor => $rotulo): ?><option value="<?= $valor ?>" <?= $statusForm === $valor ? 'selected' : '' ?>><?= $rotulo ?></option><?php endforeach; ?></select></label>
+<label class="equipment-collaborator-field" data-collaborator-combobox data-status-collaborator <?= $statusForm !== 'alocado' ? 'hidden' : '' ?>>Colaborador<select name="colaborador_id" <?= $statusForm === 'alocado' ? 'required' : 'disabled' ?>><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>" <?= (string)($registro['colaborador_id'] ?? '') === (string)$pessoa['id'] ? 'selected' : '' ?>><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
+<?php endif; ?>
 <label>Tipo<select name="tipo" class="equipment-type-select" data-equipment-type required><option value="">Selecione o tipo</option><?php $tiposFormulario = array_values(array_unique(array_merge(['notebook', 'desktop', 'monitor', 'fone', 'mouse', 'teclado', 'tv', 'celular'], $tipos, array_filter([$registro['tipo'] ?? ''])))); sort($tiposFormulario); foreach ($tiposFormulario as $tipo): ?><option value="<?= h($tipo) ?>" <?= ($registro['tipo'] ?? '') === $tipo ? 'selected' : '' ?>><?= h(ucfirst($tipo)) ?></option><?php endforeach; ?></select></label>
 <?php foreach (['marca' => 'Marca', 'modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h($registro[$campo] ?? '') ?>" maxlength="255" <?= in_array($campo, ['marca', 'modelo', 'patrimonio'], true) ? 'required' : '' ?>></label><?php endforeach; ?>
 <?php $especificacoesForm = is_array($registro['especificacoes'] ?? null) ? $registro['especificacoes'] : []; $computador = in_array($registro['tipo'] ?? '', ['notebook', 'desktop'], true); ?>
@@ -216,7 +236,7 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 </div></fieldset>
 <label class="equipment-form-wide">Observações<textarea name="observacoes" rows="3" maxlength="5000"><?= h($registro['observacoes'] ?? '') ?></textarea></label>
 <?php endif; ?>
-<div class="equipment-form-wide equipment-form-actions"><button class="equipment-primary" type="submit">Salvar</button><a class="equipment-secondary" href="equipamentos.php">Cancelar</a></div>
+<div class="equipment-form-wide equipment-form-actions"><button class="equipment-primary" type="submit"><?= $acaoForm === 'adicionar' ? 'Adicionar' : 'Salvar' ?></button><a class="equipment-secondary" href="equipamentos.php">Cancelar</a></div>
 </form></section>
 <?php endif; ?>
 <section class="equipment-filters" aria-label="Filtros de equipamentos"><h2><i class="fas fa-filter" aria-hidden="true"></i> Filtros</h2><form method="get">

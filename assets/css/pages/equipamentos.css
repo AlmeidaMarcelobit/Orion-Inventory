@@ -34,6 +34,12 @@
 .equipment-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .equipment-form-wide { grid-column: 1 / -1; }
 .equipment-form-actions { display: flex; gap: 10px; }
+.equipment-page [data-status-collaborator][hidden] { display: none; }
+.equipment-collaborator-field { position: relative; }
+.equipment-collaborator-field select[hidden] { display: none; }
+.equipment-collaborator-field .equipment-hostname-control { display: block; }
+.equipment-collaborator-field .equipment-hostname-option, .equipment-collaborator-field [role="listbox"] { display: block; }
+.equipment-collaborator-field .equipment-hostname-empty:not([hidden]) { display: block; }
 .equipment-page .equipment-type-select { appearance: none; padding-right: 38px; border-color: #ffd0e6; background-color: #fff7fb; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23ff0077' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
 .equipment-type-select option { background: #fff; color: var(--orion-text); }
 .equipment-hostname-field { position: relative; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
