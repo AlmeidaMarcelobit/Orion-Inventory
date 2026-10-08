@@ -145,7 +145,7 @@ foreach ($equipamentos as $item) {
 }
 $hostnamesDisponiveis = [];
 for ($numero = 999; $numero >= 1; $numero--) {
-    $hostname = 'NT-AAS-' . str_pad((string)$numero, 3, '0', STR_PAD_LEFT);
+    $hostname = 'NT-AS-' . str_pad((string)$numero, 3, '0', STR_PAD_LEFT);
     if (!isset($hostnamesUsados[strtolower($hostname)])) $hostnamesDisponiveis[] = $hostname;
 }
 $tipos = array_values(array_unique(array_filter(array_column($equipamentos, 'tipo')))); sort($tipos);
