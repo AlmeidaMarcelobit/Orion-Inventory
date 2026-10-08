@@ -68,6 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
                 $item['hostname'] = trim((string)($_POST['hostname'] ?? '')) ?: null;
                 $especificacoes = is_array($item['especificacoes'] ?? null) ? $item['especificacoes'] : [];
                 $enviadas = is_array($_POST['especificacoes'] ?? null) ? $_POST['especificacoes'] : [];
+                $sistemaEnviado = trim((string)($enviadas['sistema_operacional'] ?? ''));
+                $sistemaAtual = (string)($especificacoes['sistema_operacional'] ?? $item['sistema_operacional'] ?? '');
+                if ($sistemaEnviado !== '' && !in_array($sistemaEnviado, ['Windows 11', 'Windows 10', 'Ubuntu'], true) && ($acao !== 'editar' || $sistemaEnviado !== $sistemaAtual)) throw new RuntimeException('Selecione Windows 11, Windows 10 ou Ubuntu.');
                 foreach (['sistema_operacional', 'ram', 'processador'] as $campo) {
                     $valor = trim((string)($enviadas[$campo] ?? ''));
                     if (strlen($valor) > 255) throw new RuntimeException('Uma especificação excede o limite permitido.');
@@ -79,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             }
             foreach ($listas as $nome => $lista) foreach ($lista as $i => $registro) {
                 if ($acao === 'editar' && $nome === $origem && $i === $indice) continue;
+                if (!empty($item['hostname']) && strcasecmp(trim((string)($registro['hostname'] ?? '')), $item['hostname']) === 0) throw new RuntimeException('Este hostname já está em uso. Escolha outro hostname ou informe um nome personalizado disponível.');
                 if (strcasecmp((string)($registro['patrimonio'] ?? ''), $item['patrimonio']) === 0) throw new RuntimeException('Este patrimônio já está cadastrado.');
                 if ($item['serial'] && strcasecmp((string)($registro['serial'] ?? ''), $item['serial']) === 0) throw new RuntimeException('Este serial já está cadastrado.');
             }
@@ -134,6 +138,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
 }
 $equipamentos = [];
 foreach ($listas as $origem => $lista) foreach ($lista as $item) { $item['_origem'] = $origem; $equipamentos[] = $item; }
+$hostnamesUsados = [];
+foreach ($equipamentos as $item) {
+    $hostname = strtolower(trim((string)($item['hostname'] ?? '')));
+    if ($hostname !== '') $hostnamesUsados[$hostname] = true;
+}
+$hostnamesDisponiveis = [];
+for ($numero = 999; $numero >= 1; $numero--) {
+    $hostname = 'NT-AAS-' . str_pad((string)$numero, 3, '0', STR_PAD_LEFT);
+    if (!isset($hostnamesUsados[strtolower($hostname)])) $hostnamesDisponiveis[] = $hostname;
+}
 $tipos = array_values(array_unique(array_filter(array_column($equipamentos, 'tipo')))); sort($tipos);
 $filtros = [];
 foreach (['tipo', 'status', 'patrimonio', 'serial'] as $campo) $filtros[$campo] = trim((string)($_GET[$campo] ?? ''));
@@ -194,8 +208,11 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <?php foreach (['marca' => 'Marca', 'modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h($registro[$campo] ?? '') ?>" maxlength="255" <?= in_array($campo, ['marca', 'modelo', 'patrimonio'], true) ? 'required' : '' ?>></label><?php endforeach; ?>
 <?php $especificacoesForm = is_array($registro['especificacoes'] ?? null) ? $registro['especificacoes'] : []; $computador = in_array($registro['tipo'] ?? '', ['notebook', 'desktop'], true); ?>
 <fieldset class="equipment-technical equipment-form-wide" data-equipment-technical <?= !$computador ? 'hidden disabled' : '' ?>><legend>Configuração do computador</legend><div class="equipment-technical-grid">
-<label>Hostname<input name="hostname" value="<?= h($registro['hostname'] ?? '') ?>" maxlength="255" placeholder="Ex.: NT-AS-001"></label>
-<?php foreach (['sistema_operacional' => 'Sistema operacional', 'ram' => 'Memória RAM', 'processador' => 'Processador'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="especificacoes[<?= $campo ?>]" value="<?= h($especificacoesForm[$campo] ?? $registro[$campo] ?? '') ?>" maxlength="255" placeholder="<?= h(['sistema_operacional' => 'Ex.: Windows 11', 'ram' => 'Ex.: 16 GB', 'processador' => 'Ex.: Intel Core i5'][$campo]) ?>"></label><?php endforeach; ?>
+<label>Hostname<input name="hostname" list="equipment-hostnames" value="<?= h($registro['hostname'] ?? '') ?>" maxlength="255" placeholder="<?= h($hostnamesDisponiveis[0] ?? 'Nome personalizado') ?>" aria-describedby="equipment-hostname-hint"><small id="equipment-hostname-hint">Selecione um hostname disponível ou digite um nome personalizado.</small></label>
+<datalist id="equipment-hostnames"><?php foreach ($hostnamesDisponiveis as $hostname): ?><option value="<?= h($hostname) ?>"><?php endforeach; ?></datalist>
+<?php $sistemaForm = (string)($especificacoesForm['sistema_operacional'] ?? $registro['sistema_operacional'] ?? ''); ?>
+<label>Sistema operacional<select name="especificacoes[sistema_operacional]" class="equipment-type-select"><option value="">Selecione o sistema operacional</option><?php foreach (['Windows 11', 'Windows 10', 'Ubuntu'] as $sistema): ?><option value="<?= h($sistema) ?>" <?= $sistemaForm === $sistema ? 'selected' : '' ?>><?= h($sistema) ?></option><?php endforeach; ?><?php if ($sistemaForm !== '' && !in_array($sistemaForm, ['Windows 11', 'Windows 10', 'Ubuntu'], true)): ?><option value="<?= h($sistemaForm) ?>" selected><?= h($sistemaForm) ?> (atual)</option><?php endif; ?></select></label>
+<?php foreach (['ram' => 'Memória RAM', 'processador' => 'Processador'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="especificacoes[<?= $campo ?>]" value="<?= h($especificacoesForm[$campo] ?? $registro[$campo] ?? '') ?>" maxlength="255" placeholder="<?= h(['ram' => 'Ex.: 16 GB', 'processador' => 'Ex.: Intel Core i5'][$campo]) ?>"></label><?php endforeach; ?>
 <?php foreach (['bit_instalado' => 'Bitdefender', 'milvus_instalado' => 'Milvus'] as $campo => $rotulo): $instalado = filter_var($especificacoesForm[$campo] ?? $registro[$campo] ?? false, FILTER_VALIDATE_BOOLEAN); ?><label class="equipment-switch-field"><span><?= $rotulo ?></span><span class="equipment-switch-control"><input class="equipment-switch-input" type="checkbox" role="switch" name="especificacoes[<?= $campo ?>]" value="1" <?= $instalado ? 'checked' : '' ?>><span class="equipment-switch-track" aria-hidden="true"></span><span class="equipment-switch-state" aria-hidden="true"><span class="equipment-switch-no">Não</span><span class="equipment-switch-yes">Sim</span></span></span></label><?php endforeach; ?>
 </div></fieldset>
 <label class="equipment-form-wide">Observações<textarea name="observacoes" rows="3" maxlength="5000"><?= h($registro['observacoes'] ?? '') ?></textarea></label>
