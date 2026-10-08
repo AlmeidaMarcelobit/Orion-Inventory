@@ -166,11 +166,11 @@ for ($numero = 999; $numero >= 1; $numero--) {
 }
 $tipos = array_values(array_unique(array_filter(array_column($equipamentos, 'tipo')))); sort($tipos);
 $filtros = [];
-foreach (['tipo', 'status', 'patrimonio', 'serial'] as $campo) $filtros[$campo] = trim((string)($_GET[$campo] ?? ''));
+foreach (['tipo', 'status', 'patrimonio', 'serial', 'colaborador_id'] as $campo) $filtros[$campo] = trim((string)($_GET[$campo] ?? ''));
 $exibidos = array_values(array_filter($equipamentos, function ($item) use ($filtros) {
     foreach ($filtros as $campo => $valor) {
         if ($valor === '') continue;
-        if (in_array($campo, ['tipo', 'status'], true)) { if (($item[$campo] ?? '') !== $valor) return false; }
+        if (in_array($campo, ['tipo', 'status', 'colaborador_id'], true)) { if ((string)($item[$campo] ?? '') !== $valor) return false; }
         elseif (stripos((string)($item[$campo] ?? ''), $valor) === false) return false;
     }
     return true;
@@ -240,6 +240,7 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 </form></section>
 <?php endif; ?>
 <section class="equipment-filters" aria-label="Filtros de equipamentos"><h2><i class="fas fa-filter" aria-hidden="true"></i> Filtros</h2><form method="get">
+<label class="equipment-collaborator-field" data-collaborator-combobox data-collaborator-filter>Colaborador<select name="colaborador_id"><option value="">Todos os colaboradores</option><?php $pessoasFiltro = $pessoas; foreach ($equipamentos as $equipamentoFiltro) { $idPessoaFiltro = (string)($equipamentoFiltro['colaborador_id'] ?? ''); if ($idPessoaFiltro !== '' && !isset($pessoasFiltro[$idPessoaFiltro])) $pessoasFiltro[$idPessoaFiltro] = ['id' => $idPessoaFiltro, 'nome' => $equipamentoFiltro['colaborador_nome'] ?? 'Colaborador #' . $idPessoaFiltro]; } uasort($pessoasFiltro, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($pessoasFiltro as $pessoa): ?><option value="<?= h($pessoa['id']) ?>" <?= $filtros['colaborador_id'] === (string)$pessoa['id'] ? 'selected' : '' ?>><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <label>Tipo<select name="tipo"><option value="">Todos os tipos</option><?php foreach ($tipos as $tipo): ?><option value="<?= h($tipo) ?>" <?= $filtros['tipo'] === $tipo ? 'selected' : '' ?>><?= h(ucfirst($tipo)) ?></option><?php endforeach; ?></select></label>
 <label>Status<select name="status"><option value="">Todos os status</option><?php foreach ($statusNomes as $valor => $rotulo): ?><option value="<?= h($valor) ?>" <?= $filtros['status'] === $valor ? 'selected' : '' ?>><?= $rotulo ?></option><?php endforeach; ?></select></label>
 <label>Patrimônio<input name="patrimonio" placeholder="Buscar patrimônio" value="<?= h($filtros['patrimonio']) ?>"></label>

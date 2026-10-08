@@ -33,7 +33,7 @@ document.querySelectorAll('[data-collaborator-combobox]').forEach((field, fieldI
     control.className = 'equipment-hostname-control';
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = 'Digite o nome do colaborador';
+    input.placeholder = field.hasAttribute('data-collaborator-filter') ? 'Todos · buscar colaborador' : 'Digite o nome do colaborador';
     input.autocomplete = 'off';
     input.required = select.required;
     input.disabled = select.disabled;
