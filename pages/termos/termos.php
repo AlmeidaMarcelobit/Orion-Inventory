@@ -39,7 +39,7 @@ try {
             $equipamentos[] = $item;
         };
     }
-    $linhas = lerListaTermos($base . "/data/linhas.json");
+    $linhas = lerListaTermos($base . "/data/linhas/linhas.json");
     $termos = lerListaTermos($base . "/data/termos.json", true);
 } catch (Throwable $e) {
     $erro = "Não foi possível carregar os dados. Verifique os JSON da pasta /data.";

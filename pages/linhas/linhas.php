@@ -5,7 +5,7 @@ orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 date_default_timezone_set('America/Sao_Paulo');
 $base = dirname(__DIR__, 2);
-$arquivo = $base . '/data/linhas.json';
+$arquivo = $base . '/data/linhas/linhas.json';
 $tipos = ['chip' => 'Chip físico', 'echip' => 'eSIM'];
 $statusNomes = ['disponivel' => 'Disponível', 'alocado' => 'Alocado', 'indisponivel' => 'Indisponível', 'whatsapp_bloqueado' => 'WhatsApp bloqueado'];
 function h($valor): string { return htmlspecialchars((string)($valor ?? ''), ENT_QUOTES, 'UTF-8'); }
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
     $lock = null;
     try {
         if (!hash_equals($_SESSION['linhas_csrf'], (string)($_POST['csrf'] ?? ''))) throw new RuntimeException('Sessão inválida. Atualize a página.');
-        $lock = fopen($base . '/data/.linhas.lock', 'c');
+        $lock = fopen($base . '/data/linhas/.linhas.lock', 'c');
         if (!$lock || !flock($lock, LOCK_EX)) throw new RuntimeException('Não foi possível salvar os dados.');
         $linhas = lerLista($arquivo);
         $originais = $linhas;

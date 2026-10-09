@@ -25,7 +25,7 @@ $emprestados = $ler('equipamentos/emprestados.json');
 $internos = $ler('equipamentos/internos.json');
 $manutencao = $ler('equipamentos/manutencao.json');
 $foraUso = $ler('equipamentos/fora_uso.json');
-$linhas = $ler('linhas.json');
+$linhas = $ler('linhas/linhas.json');
 
 $equipamentosTotal = count($estoque) + count($alocados) + count($emprestados) + count($internos) + count($manutencao) + count($foraUso);
 $linhasAlocadas = count(array_filter($linhas, static fn($linha) => in_array($linha['status'] ?? '', ['alocado', 'emprestado'], true)));

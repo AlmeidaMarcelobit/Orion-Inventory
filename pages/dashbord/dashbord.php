@@ -147,7 +147,7 @@ if (!isset($_SESSION['usuario_id'])) {
                 json("equipamentos/internos.json"),
                 json("equipamentos/manutencao.json"),
                 json("equipamentos/fora_uso.json"),
-                json("linhas.json")
+                json("linhas/linhas.json")
             ])
                 .then(([colaboradores, estoque, alocados, emprestados, internos, manutencao, foraUso, linhas]) => {
                     const equipamentosAlocados = total(alocados);
