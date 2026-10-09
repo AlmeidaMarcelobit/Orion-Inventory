@@ -26,21 +26,22 @@ if (equipmentStatus && statusCollaborator) {
     updateCollaborator();
 }
 
-document.querySelectorAll('[data-collaborator-combobox]').forEach((field, fieldIndex) => {
+document.querySelectorAll('[data-collaborator-combobox], [data-equipment-combobox]').forEach((field, fieldIndex) => {
+    const isEquipment = field.hasAttribute('data-equipment-combobox');
     const select = field.querySelector('select');
     const entries = [...select.options].filter((option) => option.value !== '');
     const control = document.createElement('span');
     control.className = 'equipment-hostname-control';
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = field.hasAttribute('data-collaborator-filter') ? 'Todos · buscar colaborador' : 'Digite o nome do colaborador';
+    input.placeholder = isEquipment ? 'Digite o patrimônio, hostname ou modelo' : (field.hasAttribute('data-collaborator-filter') ? 'Todos · buscar colaborador' : 'Digite o nome do colaborador');
     input.autocomplete = 'off';
     input.required = select.required;
     input.disabled = select.disabled;
     input.setAttribute('role', 'combobox');
     input.setAttribute('aria-autocomplete', 'list');
     input.setAttribute('aria-expanded', 'false');
-    input.setAttribute('aria-label', 'Colaborador');
+    input.setAttribute('aria-label', isEquipment ? 'Equipamento / patrimônio' : 'Colaborador');
     input.setAttribute('aria-controls', `collaborator-options-${fieldIndex}`);
     input.value = select.value ? select.selectedOptions[0].textContent : '';
     control.append(input);
@@ -50,11 +51,11 @@ document.querySelectorAll('[data-collaborator-combobox]').forEach((field, fieldI
     const list = document.createElement('span');
     list.id = `collaborator-options-${fieldIndex}`;
     list.setAttribute('role', 'listbox');
-    list.setAttribute('aria-label', 'Colaboradores disponíveis');
+    list.setAttribute('aria-label', isEquipment ? 'Equipamentos disponíveis' : 'Colaboradores disponíveis');
     dropdown.append(list);
     const empty = document.createElement('span');
     empty.className = 'equipment-hostname-empty';
-    empty.textContent = 'Nenhum colaborador encontrado.';
+    empty.textContent = isEquipment ? 'Nenhum equipamento encontrado.' : 'Nenhum colaborador encontrado.';
     dropdown.append(empty);
     select.hidden = true;
     select.required = false;
@@ -106,9 +107,10 @@ document.querySelectorAll('[data-collaborator-combobox]').forEach((field, fieldI
     };
     input.addEventListener('focus', show);
     input.addEventListener('input', () => {
-        const exact = entries.find((entry) => normalize(entry.textContent) === normalize(input.value));
+        const matches = entries.filter((entry) => normalize(entry.textContent) === normalize(input.value) || (isEquipment && input.value.trim() !== '' && normalize(entry.dataset.patrimonio || '') === normalize(input.value)));
+        const exact = matches.length === 1 ? matches[0] : null;
         select.value = exact ? exact.value : '';
-        input.setCustomValidity(input.value && !exact ? 'Selecione um colaborador da lista de sugestões.' : '');
+        input.setCustomValidity(input.value && !exact ? (isEquipment ? 'Selecione um equipamento da lista ou digite o patrimônio completo.' : 'Selecione um colaborador da lista de sugestões.') : '');
         show();
     });
     input.addEventListener('keydown', (event) => {
