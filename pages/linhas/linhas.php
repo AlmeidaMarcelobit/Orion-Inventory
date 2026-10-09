@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 date_default_timezone_set('America/Sao_Paulo');
 $base = dirname(__DIR__, 2);
@@ -99,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             file_put_contents($arquivo, json_encode($originais, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
             throw new RuntimeException('Não foi possível salvar a linha.');
         }
+        orionRegistrarMovimentacao($acao, 'linha', $indice !== null ? $originais[$indice] : null, $linha);
         $_SESSION['linhas_mensagem'] = 'Linha ' . ['adicionar' => 'adicionada', 'editar' => 'atualizada', 'alocar' => 'alocada', 'desvincular' => 'desvinculada', 'bloquear' => 'bloqueada', 'desbloquear' => 'desbloqueada'][$acao] . ' com sucesso.';
         flock($lock, LOCK_UN); fclose($lock);
         header('Location: linhas.php'); exit;

@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 $arquivo = dirname(__DIR__, 2) . '/data/colaboradores/ativos.json';
 $colaboradores = json_decode(file_get_contents($arquivo), true) ?: [];
@@ -32,8 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $colaboradores[$indice]['cpf'] = $cpf;
         $colaboradores[$indice]['tipo_trabalho'] = $tipoTrabalho;
         $colaboradores[$indice]['data_atualizacao'] = date('Y-m-d H:i:s');
-        file_put_contents($arquivo, json_encode($colaboradores, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-        header('Location: colaboradores.php'); exit;
+        $json = json_encode($colaboradores, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (file_put_contents($arquivo, $json, LOCK_EX) !== strlen($json)) $erro = 'Não foi possível salvar o colaborador.';
+        else { orionRegistrarMovimentacao('editar', 'colaborador', $colaborador, $colaboradores[$indice]); header('Location: colaboradores.php'); exit; }
     }
     $colaborador = array_merge($colaborador, $_POST);
 }

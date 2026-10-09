@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 date_default_timezone_set('America/Sao_Paulo');
 $base = dirname(__DIR__, 2);
@@ -40,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
         $acao = (string)($_POST['acao'] ?? '');
         $agora = date('Y-m-d H:i:s');
         $usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+        $chamadoAntes = null;
         if ($acao === 'abrir') {
             if (!$colaborador || !isset($ativos[$idPessoa])) throw new RuntimeException('Selecione um colaborador ativo para abrir o chamado.');
             $categoria = (string)($_POST['categoria'] ?? '');
@@ -66,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             $indice = null; foreach ($chamados as $i => $chamado) if ((string)$chamado['id'] === (string)($_POST['id'] ?? '')) { $indice = $i; break; }
             if ($indice === null) throw new RuntimeException('Chamado não encontrado.');
             if ($chamados[$indice]['status'] !== 'aberto') throw new RuntimeException('Este chamado já está fechado.');
+            $chamadoAntes = $chamados[$indice];
             $resolucao = trim((string)($_POST['resolucao'] ?? ''));
             if ($resolucao === '' || strlen($resolucao) > 5000) throw new RuntimeException('Informe a solução ou o motivo do fechamento em até 5.000 caracteres.');
             $chamados[$indice]['status'] = 'fechado';
@@ -79,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
         $json = json_encode($chamados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $temp = $pastaChamados . '/.chamados-' . bin2hex(random_bytes(8)) . '.tmp';
         if (file_put_contents($temp, $json, LOCK_EX) !== strlen($json) || !rename($temp, $arquivo)) throw new RuntimeException('Não foi possível registrar o chamado.');
+        orionRegistrarMovimentacao($acao, 'chamado', $chamadoAntes, $acao === 'abrir' ? $chamados[count($chamados) - 1] : $chamados[$indice]);
         flock($lock, LOCK_UN); fclose($lock);
         $_SESSION['chamados_mensagem'] = $mensagem;
         header('Location: chamado.php' . ($idPessoa !== '' ? '?colaborador_id=' . urlencode($idPessoa) : '')); exit;

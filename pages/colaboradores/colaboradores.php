@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 $arquivo = dirname(__DIR__, 2) . '/data/colaboradores/ativos.json';
 $colaboradores = json_decode(file_get_contents($arquivo), true) ?: [];
@@ -26,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $acao === 'inativar') {
     $idInativar = (string)($_POST['id'] ?? '');
     foreach ($colaboradores as $indice => $colaborador) {
         if ((string)($colaborador['id'] ?? '') !== $idInativar) continue;
+        $colaboradorAntes = $colaborador;
+        $movimentosInativacao = [];
         $inativos = json_decode(file_get_contents($arquivoInativos), true) ?: [];
         $colaborador['data_inativacao'] = date('Y-m-d H:i:s');
         $inativos[] = $colaborador; unset($colaboradores[$indice]);
@@ -33,17 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $acao === 'inativar') {
         $pendencias = file_exists($arquivoPendencias) ? (json_decode(file_get_contents($arquivoPendencias), true) ?: []) : [];
         foreach ($equipamentos as &$equipamento) {
             if ((string)($equipamento['colaborador_id'] ?? '') !== $idInativar || ($equipamento['status'] ?? '') !== 'alocado') continue;
+            $equipamentoAntes = $equipamento;
             $equipamento['status'] = 'pendente_devolucao';
             $equipamento['data_pendencia_devolucao'] = date('Y-m-d H:i:s');
             $equipamento['motivo_pendencia'] = 'Colaborador inativado';
             $equipamento['colaborador_nome'] = $colaborador['nome'] ?? '';
             $pendencias[] = $equipamento;
+            $movimentosInativacao[] = [$equipamentoAntes, $equipamento];
         }
         unset($equipamento);
-        file_put_contents(dirname(__DIR__, 2) . '/data/equipamentos/alocados.json', json_encode($equipamentos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-        file_put_contents($arquivoPendencias, json_encode($pendencias, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-        file_put_contents($arquivo, json_encode(array_values($colaboradores), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-        file_put_contents($arquivoInativos, json_encode($inativos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+        foreach ([dirname(__DIR__, 2) . '/data/equipamentos/alocados.json' => $equipamentos, $arquivoPendencias => $pendencias, $arquivo => array_values($colaboradores), $arquivoInativos => $inativos] as $destinoArquivo => $dadosSalvar) {
+            $json = json_encode($dadosSalvar, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            if (file_put_contents($destinoArquivo, $json, LOCK_EX) !== strlen($json)) throw new RuntimeException('Não foi possível concluir a inativação do colaborador.');
+        }
+        orionRegistrarMovimentacao('inativar', 'colaborador', $colaboradorAntes, array_merge($colaborador, ['ativo' => false]), ['equipamentos_pendentes' => count($movimentosInativacao)]);
+        foreach ($movimentosInativacao as [$antes, $depois]) orionRegistrarMovimentacao('pendencia_devolucao', 'equipamento', $antes, $depois, ['motivo' => 'Colaborador inativado']);
         header('Location: colaboradores.php'); exit;
     }
 }

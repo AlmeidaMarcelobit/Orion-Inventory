@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['usuario_id'])) {

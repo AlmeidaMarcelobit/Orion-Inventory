@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 $tipo = basename(__FILE__, '.php');
 $arquivo = dirname(__DIR__, 2) . '/data/colaboradores/' . ($tipo === 'inativos' ? 'inativos.json' : 'terceiros.json');

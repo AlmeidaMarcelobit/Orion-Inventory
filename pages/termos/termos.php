@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: ../../index.php");
     exit();
@@ -217,6 +219,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !$erro) {
             }
             throw new RuntimeException("Não foi possível registrar o termo.");
         }
+        orionRegistrarMovimentacao($acao, 'termo', null, ['id' => $id, 'colaborador_id' => $colaborador['id'], 'colaborador_nome' => $colaborador['nome'], 'tipo' => $tipo], ['arquivo' => 'termo/' . $nomePasta . '/' . $nomeArquivo]);
         flock($lock, LOCK_UN);
         fclose($lock);
         $_SESSION["termos_mensagem"] =

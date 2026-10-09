@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 date_default_timezone_set('America/Sao_Paulo');
 $base = dirname(__DIR__, 2);
@@ -154,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             foreach ($gravados as $nome) file_put_contents($base . '/data/equipamentos/' . $nome . '.json', json_encode($originais[$nome], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
             throw $e;
         }
+        orionRegistrarMovimentacao($acao, 'equipamento', $indice !== null ? $originais[$origem][$indice] : null, $item);
         $_SESSION['equipamentos_mensagem'] = 'Equipamento ' . ['adicionar' => 'adicionado', 'editar' => 'atualizado', 'alocar' => 'alocado', 'desvincular' => 'desvinculado'][$acao] . ' com sucesso.';
         flock($lock, LOCK_UN); fclose($lock);
         header('Location: equipamentos.php'); exit;

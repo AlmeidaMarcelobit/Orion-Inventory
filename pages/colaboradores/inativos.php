@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
+orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 $tipo = basename(__FILE__, '.php');
 $arquivo = dirname(__DIR__, 2) . '/data/colaboradores/' . ($tipo === 'inativos' ? 'inativos.json' : 'terceiros.json');
@@ -13,16 +15,19 @@ $pendencias = json_decode(file_get_contents(dirname(__DIR__, 2) . '/data/equipam
     $devolvido = null;
     foreach ($alocados as $indice => &$item) {
         if ((string)($item['id'] ?? '') === $idEquipamento) {
-            $item['status'] = 'estoque'; $item['colaborador_id'] = null; $item['data_devolucao'] = date('Y-m-d H:i:s');
+            $devolvidoAntes = $item;
+            $item['status'] = 'estoque'; $item['colaborador_id'] = null; $item['centro_custo'] = '11001'; $item['data_devolucao'] = date('Y-m-d H:i:s');
             $devolvido = $item; unset($alocados[$indice]); break;
         }
     }
     unset($item);
     if ($devolvido) { $estoque[] = $devolvido; }
     $pendencias = array_values(array_filter($pendencias, fn($item) => (string)($item['id'] ?? '') !== $idEquipamento));
-    file_put_contents($arquivoAlocados, json_encode(array_values($alocados), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-    file_put_contents(dirname(__DIR__, 2) . '/data/equipamentos/estoque.json', json_encode($estoque, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
-    file_put_contents(dirname(__DIR__, 2) . '/data/equipamentos/devolucoes_pendentes.json', json_encode($pendencias, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+    foreach ([$arquivoAlocados => array_values($alocados), dirname(__DIR__, 2) . '/data/equipamentos/estoque.json' => $estoque, dirname(__DIR__, 2) . '/data/equipamentos/devolucoes_pendentes.json' => $pendencias] as $destinoArquivo => $dadosSalvar) {
+        $json = json_encode($dadosSalvar, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if (file_put_contents($destinoArquivo, $json, LOCK_EX) !== strlen($json)) throw new RuntimeException('Não foi possível concluir a devolução do equipamento.');
+    }
+    if ($devolvido) orionRegistrarMovimentacao('desvincular', 'equipamento', $devolvidoAntes, $devolvido, ['origem' => 'devolucao_pendente']);
     header('Location: inativos.php'); exit;
 }
 $titulo = $tipo === 'inativos' ? 'Colaboradores inativos' : 'Terceiros';

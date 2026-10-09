@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/includes/auditoria.php';
 
 $usuariosArquivo = __DIR__ . '/data/usuarios.json';
 $usuarios = json_decode(file_get_contents($usuariosArquivo), true) ?: [];
@@ -16,10 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     foreach ($usuarios as $usuario) {
         if (($usuario['username'] ?? '') === $username && ($usuario['ativo'] ?? false) && password_verify($password, $usuario['password'] ?? '')) {
+            session_regenerate_id(true);
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
             $_SESSION['usuario_nivel'] = $usuario['nivel'];
-            $_SESSION['login_time'] = time();
+            $_SESSION['usuario_username'] = $usuario['username'];
+            orionRegistrarEntrada();
             header('Location: pages/dashbord/dashbord.php');
             exit;
         }
