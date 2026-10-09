@@ -256,7 +256,7 @@ $uploads = array_values(array_filter($termos, fn($t) => $t["origem"] === "upload
 <li class="item-menu"><a href="../equipamentos/equipamentos.php"><span class="item"><i class="bi bi-pc-display-horizontal"></i></span><span class="txt-link">Equipamentos</span></a></li>
 <li class="item-menu"><a href="../linhas/linhas.php"><span class="item"><i class="bi bi-sd-card"></i></span><span class="txt-link">Linhas</span></a></li>
 <li class="item-menu active"><a href="termos.php" aria-current="page"><span class="item"><i class="bi bi-file-earmark-pdf"></i></span><span class="txt-link">Termos</span></a></li>
-<li class="item-menu"><a href="#"><span class="item"><i class="bi bi-tools"></i></span><span class="txt-link">Manutenção</span></a></li>
+<li class="item-menu"><a href="../manutencao/manutencao.php"><span class="item"><i class="bi bi-tools"></i></span><span class="txt-link">Manutenção</span></a></li>
 <li class="item-menu"><a href="../chamado/chamado.php"><span class="item"><i class="bi bi-headset"></i></span><span class="txt-link">Chamado</span></a></li>
 <li class="item-menu"><a href="#"><span class="item"><i class="bi bi-person-circle"></i></span><span class="txt-link">Usuários</span></a></li>
 </ul></nav>

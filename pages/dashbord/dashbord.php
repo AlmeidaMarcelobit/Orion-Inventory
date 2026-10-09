@@ -55,7 +55,7 @@ if (!isset($_SESSION['usuario_id'])) {
                         </a>
                     </li>
                     <li class="item-menu">
-                        <a href="">
+                        <a href="../manutencao/manutencao.php">
                             <span class="item"><i class="bi bi-tools"></i></span>
                             <span class="txt-link">Manutenção</span>
                         </a>
