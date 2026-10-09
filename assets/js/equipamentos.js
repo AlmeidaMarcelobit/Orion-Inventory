@@ -9,7 +9,7 @@ const equipmentStatus = document.querySelector('[data-equipment-status]');
 const statusCollaborator = document.querySelector('[data-status-collaborator]');
 if (equipmentStatus && statusCollaborator) {
     const updateCollaborator = () => {
-        const allocated = equipmentStatus.value === 'alocado';
+        const allocated = !equipmentStatus.disabled && ['alocado', 'emprestado'].includes(equipmentStatus.value);
         statusCollaborator.hidden = !allocated;
         const select = statusCollaborator.querySelector('select');
         select.disabled = !allocated;

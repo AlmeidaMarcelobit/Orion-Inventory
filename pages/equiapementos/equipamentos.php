@@ -86,21 +86,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
                 if (strcasecmp((string)($registro['patrimonio'] ?? ''), $item['patrimonio']) === 0) throw new RuntimeException('Este patrimônio já está cadastrado.');
                 if ($item['serial'] && strcasecmp((string)($registro['serial'] ?? ''), $item['serial']) === 0) throw new RuntimeException('Este serial já está cadastrado.');
             }
-            if ($acao === 'adicionar') {
-                $statusCadastro = (string)($_POST['status'] ?? 'estoque');
-                if (!in_array($statusCadastro, ['alocado', 'fora_uso', 'estoque', 'interno'], true)) throw new RuntimeException('Selecione um status permitido para o cadastro.');
+            {
+                $statusAnterior = (string)($item['status'] ?? 'estoque');
+                $statusCadastro = (string)($_POST['status'] ?? $statusAnterior);
+                $emManutencao = $acao === 'editar' && ($statusAnterior === 'manutencao' || $origem === 'manutencao');
+                if ($emManutencao && $statusCadastro !== $statusAnterior) throw new RuntimeException('O status de equipamentos em manutenção só pode ser alterado na área de manutenção.');
+                $permitidos = $acao === 'adicionar' ? ['alocado', 'fora_uso', 'estoque', 'interno'] : ['alocado', 'emprestado', 'fora_uso', 'estoque', 'interno'];
+                if (!$emManutencao && !in_array($statusCadastro, $permitidos, true) && !($acao === 'editar' && $statusCadastro === $statusAnterior && $statusAnterior === 'pendente_devolucao')) throw new RuntimeException('Selecione um status permitido. Manutenção é gerida em outra área.');
                 $item['status'] = $statusCadastro;
-                $destino = $fontes[$statusCadastro];
-                if ($statusCadastro === 'alocado') {
-                    $colaboradorId = (string)($_POST['colaborador_id'] ?? '');
-                    if (!isset($ativos[$colaboradorId])) throw new RuntimeException('Selecione um colaborador ativo para cadastrar o equipamento alocado.');
+                $destino = $fontes[$statusCadastro] ?? $origem;
+                $colaboradorId = (string)($_POST['colaborador_id'] ?? $item['colaborador_id'] ?? '');
+                $novoVinculo = $acao === 'adicionar' || $statusCadastro !== $statusAnterior || $colaboradorId !== (string)($item['colaborador_id'] ?? '');
+                if (in_array($statusCadastro, ['alocado', 'emprestado'], true) && $novoVinculo) {
+                    if (!isset($ativos[$colaboradorId])) throw new RuntimeException('Selecione um colaborador ativo para vincular o equipamento.');
                     $centroCusto = trim((string)($ativos[$colaboradorId]['centro_custo'] ?? ''));
                     if ($centroCusto === '') throw new RuntimeException('O colaborador selecionado não possui centro de custo cadastrado.');
                     $item['colaborador_id'] = $ativos[$colaboradorId]['id'];
                     $item['colaborador_nome'] = $ativos[$colaboradorId]['nome'];
                     $item['centro_custo'] = $centroCusto;
                     $item['data_atribuicao'] = date('Y-m-d H:i:s');
-                    $item['tipo_atribuicao'] = 'alocacao';
+                    $item['tipo_atribuicao'] = $statusCadastro === 'emprestado' ? 'emprestimo' : 'alocacao';
+                } elseif ($acao === 'editar' && $statusCadastro !== $statusAnterior && in_array($statusCadastro, ['estoque', 'fora_uso', 'interno'], true)) {
+                    $item['colaborador_id'] = null;
+                    $item['colaborador_nome'] = null;
+                    $item['centro_custo'] = '11001';
+                    $item['data_atribuicao'] = null;
+                    $item['tipo_atribuicao'] = null;
                 }
             }
         } elseif ($acao === 'alocar') {
@@ -220,10 +231,9 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <p class="equipment-form-wide"><?= h(($registro['marca'] ?? '') . ' ' . ($registro['modelo'] ?? '') . ' · Patrimônio ' . ($registro['patrimonio'] ?? '')) ?></p>
 <label class="equipment-form-wide equipment-collaborator-field" data-collaborator-combobox>Colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>"><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <?php else: ?>
-<?php if ($acaoForm === 'adicionar'): $statusForm = (string)($registro['status'] ?? 'estoque'); ?>
-<label>Status<select name="status" class="equipment-type-select" data-equipment-status required><?php foreach (['estoque' => 'Inventário', 'alocado' => 'Alocado', 'fora_uso' => 'Fora de uso', 'interno' => 'Interno'] as $valor => $rotulo): ?><option value="<?= $valor ?>" <?= $statusForm === $valor ? 'selected' : '' ?>><?= $rotulo ?></option><?php endforeach; ?></select></label>
-<label class="equipment-collaborator-field" data-collaborator-combobox data-status-collaborator <?= $statusForm !== 'alocado' ? 'hidden' : '' ?>>Colaborador<select name="colaborador_id" <?= $statusForm === 'alocado' ? 'required' : 'disabled' ?>><option value="">Selecione um colaborador</option><?php uasort($ativos, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($ativos as $pessoa): ?><option value="<?= h($pessoa['id']) ?>" <?= (string)($registro['colaborador_id'] ?? '') === (string)$pessoa['id'] ? 'selected' : '' ?>><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
-<?php endif; ?>
+<?php $statusForm = (string)($registro['status'] ?? 'estoque'); $origemForm = $registro['_origem'] ?? $registro['origem'] ?? ''; $statusBloqueado = $acaoForm === 'editar' && ($statusForm === 'manutencao' || $origemForm === 'manutencao'); $opcoesStatus = ['estoque' => 'Inventário', 'alocado' => 'Alocado', 'fora_uso' => 'Fora de uso', 'interno' => 'Interno']; if ($acaoForm === 'editar') $opcoesStatus['emprestado'] = 'Emprestado'; if ($statusBloqueado || $statusForm === 'pendente_devolucao') $opcoesStatus[$statusForm] = $statusNomes[$statusForm] ?? $statusForm; $formVinculado = !$statusBloqueado && in_array($statusForm, ['alocado', 'emprestado'], true); ?>
+<label>Status<select name="status" class="equipment-type-select" data-equipment-status required <?= $statusBloqueado ? 'disabled' : '' ?>><?php foreach ($opcoesStatus as $valor => $rotulo): ?><option value="<?= h($valor) ?>" <?= $statusForm === $valor ? 'selected' : '' ?>><?= h($rotulo) ?></option><?php endforeach; ?></select><?php if ($statusBloqueado): ?><small>O status é gerido na área de manutenção.</small><?php endif; ?></label>
+<label class="equipment-collaborator-field" data-collaborator-combobox data-status-collaborator <?= !$formVinculado ? 'hidden' : '' ?>>Colaborador<select name="colaborador_id" <?= $formVinculado ? 'required' : 'disabled' ?>><option value="">Selecione um colaborador</option><?php $pessoasFormulario = $ativos; $idAtual = (string)($registro['colaborador_id'] ?? ''); if ($idAtual !== '' && !isset($pessoasFormulario[$idAtual])) $pessoasFormulario[$idAtual] = $pessoas[$idAtual] ?? ['id' => $idAtual, 'nome' => $registro['colaborador_nome'] ?? 'Colaborador #' . $idAtual]; uasort($pessoasFormulario, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($pessoasFormulario as $pessoa): ?><option value="<?= h($pessoa['id']) ?>" <?= $idAtual === (string)$pessoa['id'] ? 'selected' : '' ?>><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <label>Tipo<select name="tipo" class="equipment-type-select" data-equipment-type required><option value="">Selecione o tipo</option><?php $tiposFormulario = array_values(array_unique(array_merge(['notebook', 'desktop', 'monitor', 'fone', 'mouse', 'teclado', 'tv', 'celular'], $tipos, array_filter([$registro['tipo'] ?? ''])))); sort($tiposFormulario); foreach ($tiposFormulario as $tipo): ?><option value="<?= h($tipo) ?>" <?= ($registro['tipo'] ?? '') === $tipo ? 'selected' : '' ?>><?= h(ucfirst($tipo)) ?></option><?php endforeach; ?></select></label>
 <?php foreach (['marca' => 'Marca', 'modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h($registro[$campo] ?? '') ?>" maxlength="255" <?= in_array($campo, ['marca', 'modelo', 'patrimonio'], true) ? 'required' : '' ?>></label><?php endforeach; ?>
 <?php $especificacoesForm = is_array($registro['especificacoes'] ?? null) ? $registro['especificacoes'] : []; $computador = in_array($registro['tipo'] ?? '', ['notebook', 'desktop'], true); ?>
