@@ -35,7 +35,7 @@ if (!isset($_SESSION['usuario_id'])) {
                         </a>
                     </li>
                     <li class="item-menu">
-                        <a href="../equiapementos/equipamentos.php">
+                        <a href="../equipamentos/equipamentos.php">
                             <span class="item"><i class="bi bi-pc-display-horizontal"></i></span>
                             <span class="txt-link">Equipamentos</span>
                         </a>
