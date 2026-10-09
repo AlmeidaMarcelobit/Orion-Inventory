@@ -13,6 +13,7 @@ $marcasPorTipo = [
     'tv' => ['Samsung', 'LG'],
     'monitor' => ['Samsung', 'Dell', 'AOC', 'LG', 'Philips'],
     'teclado' => ['Dell', 'Logitech', 'Philips'],
+    'mouse' => ['Dell', 'Logitech', 'Philips'],
     'fone' => ['Jabra', 'Logitech', 'Gamenot'],
 ];
 $modelosFone = ['Jabra' => ['HSC015', 'HSC016'], 'Logitech' => ['H390'], 'Gamenot' => ['FUXI-H3']];
