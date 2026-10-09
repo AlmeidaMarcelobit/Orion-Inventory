@@ -41,7 +41,7 @@ if (!isset($_SESSION['usuario_id'])) {
                         </a>
                     </li>
                     <li class="item-menu">
-                        <a href="">
+                        <a href="../linhas/linhas.php">
                             <span class="item"><i class="bi bi-sd-card"></i></span>
                             <span class="txt-link">Linhas</span>
                         </a>
