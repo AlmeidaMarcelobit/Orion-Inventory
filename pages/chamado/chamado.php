@@ -3,7 +3,8 @@ session_start();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 date_default_timezone_set('America/Sao_Paulo');
 $base = dirname(__DIR__, 2);
-$arquivo = $base . '/data/chamados.json';
+$pastaChamados = $base . '/data/chamado';
+$arquivo = $pastaChamados . '/chamados.json';
 $categorias = ['hardware' => 'Hardware', 'sistema' => 'Sistema'];
 $servicos = ['email' => 'E-mail', 'chat' => 'Chat', 'reset_senha' => 'Reset de senha', 'drive' => 'Drive', 'active_directory' => 'Active Directory', 'equipamento' => 'Equipamento'];
 $sintomas = ['travando' => 'Travando / lentidão', 'camera' => 'Câmera', 'teclado' => 'Teclado', 'som' => 'Som', 'outro' => 'Outro problema'];
@@ -32,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
     $lock = null; $temp = null;
     try {
         if (!hash_equals($_SESSION['chamados_csrf'], (string)($_POST['csrf'] ?? ''))) throw new RuntimeException('Sessão inválida. Atualize a página.');
-        $lock = fopen($base . '/data/.chamados.lock', 'c');
+        if (!is_dir($pastaChamados) && !mkdir($pastaChamados, 0775, true)) throw new RuntimeException('Não foi possível criar a pasta de chamados.');
+        $lock = fopen($pastaChamados . '/.chamados.lock', 'c');
         if (!$lock || !flock($lock, LOCK_EX)) throw new RuntimeException('Não foi possível salvar o chamado.');
         $chamados = lerChamadosLista($arquivo, true);
         $acao = (string)($_POST['acao'] ?? '');
@@ -75,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             $mensagem = 'Chamado #' . $chamados[$indice]['id'] . ' fechado com sucesso.';
         } else { throw new RuntimeException('Ação inválida.'); }
         $json = json_encode($chamados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-        $temp = $base . '/data/.chamados-' . bin2hex(random_bytes(8)) . '.tmp';
+        $temp = $pastaChamados . '/.chamados-' . bin2hex(random_bytes(8)) . '.tmp';
         if (file_put_contents($temp, $json, LOCK_EX) !== strlen($json) || !rename($temp, $arquivo)) throw new RuntimeException('Não foi possível registrar o chamado.');
         flock($lock, LOCK_UN); fclose($lock);
         $_SESSION['chamados_mensagem'] = $mensagem;
