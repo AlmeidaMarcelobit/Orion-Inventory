@@ -58,7 +58,8 @@ if (!isset($_SESSION['usuario_id'])) {
                             <span class="txt-link">Manutenção</span>
                         </a>
                     </li>
-                    <li class="item-menu">
+                    <li class="item-menu"><a href="../chamado/chamado.php"><span class="item"><i class="bi bi-headset"></i></span><span class="txt-link">Chamado</span></a></li>
+<li class="item-menu">
                         <a href="">
                             <span class="item"><i class="bi bi-person-circle"></i></span>
                             <span class="txt-link">Usuarios</span>
