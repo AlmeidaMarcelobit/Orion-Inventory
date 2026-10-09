@@ -5,6 +5,31 @@ document.querySelectorAll('form[data-confirm]').forEach((form) => {
 });
 
 const equipmentType = document.querySelector('[data-equipment-type]');
+const equipmentBrand = document.querySelector('[data-equipment-brand]');
+if (equipmentType && equipmentBrand) {
+    const brands = JSON.parse(equipmentBrand.dataset.brands);
+    const defaultBrands = JSON.parse(equipmentBrand.dataset.defaultBrands);
+    const model = equipmentBrand.closest('form').querySelector('[name="modelo"]');
+    let savedModel = model.value;
+    let wasSupport = equipmentType.value === 'suporte';
+    const updateBrands = () => {
+        const previous = equipmentBrand.value;
+        const allowed = brands[equipmentType.value] || defaultBrands;
+        equipmentBrand.replaceChildren(new Option('Selecione a marca', ''));
+        allowed.forEach((brand) => equipmentBrand.add(new Option(brand, brand)));
+        equipmentBrand.value = allowed.find((brand) => brand.toLowerCase() === previous.toLowerCase()) || '';
+        const support = equipmentType.value === 'suporte';
+        if (support) {
+            if (!wasSupport) savedModel = model.value;
+            equipmentBrand.value = 'Fussem';
+            model.value = 'Alumínio';
+        } else if (wasSupport) model.value = savedModel === 'Alumínio' ? '' : savedModel;
+        model.readOnly = support;
+        wasSupport = support;
+    };
+    equipmentType.addEventListener('change', updateBrands);
+    updateBrands();
+}
 const equipmentStatus = document.querySelector('[data-equipment-status]');
 const statusCollaborator = document.querySelector('[data-status-collaborator]');
 if (equipmentStatus && statusCollaborator) {
