@@ -9,9 +9,25 @@ const equipmentBrand = document.querySelector('[data-equipment-brand]');
 if (equipmentType && equipmentBrand) {
     const brands = JSON.parse(equipmentBrand.dataset.brands);
     const defaultBrands = JSON.parse(equipmentBrand.dataset.defaultBrands);
-    const model = equipmentBrand.closest('form').querySelector('[name="modelo"]');
+    const model = equipmentBrand.closest('form').querySelector('input[name="modelo"]');
+    const headsetModel = equipmentBrand.closest('form').querySelector('[data-headset-model]');
+    const headsetModels = JSON.parse(equipmentBrand.dataset.headsetModels);
     let savedModel = model.value;
     let wasSupport = equipmentType.value === 'suporte';
+    const updateModels = () => {
+        const headset = equipmentType.value === 'fone';
+        model.hidden = headset;
+        model.disabled = headset;
+        model.required = !headset;
+        headsetModel.hidden = !headset;
+        headsetModel.disabled = !headset;
+        headsetModel.required = headset;
+        const previous = headsetModel.value || model.value;
+        const allowed = headsetModels[equipmentBrand.value] || [];
+        headsetModel.replaceChildren(new Option('Selecione o modelo', ''));
+        allowed.forEach((value) => headsetModel.add(new Option(value, value)));
+        headsetModel.value = allowed.find((value) => value.toLowerCase() === previous.toLowerCase()) || (allowed.length === 1 ? allowed[0] : '');
+    };
     const updateBrands = () => {
         const previous = equipmentBrand.value;
         const allowed = brands[equipmentType.value] || defaultBrands;
@@ -26,7 +42,9 @@ if (equipmentType && equipmentBrand) {
         } else if (wasSupport) model.value = savedModel === 'Alumínio' ? '' : savedModel;
         model.readOnly = support;
         wasSupport = support;
+        updateModels();
     };
+    equipmentBrand.addEventListener('change', updateModels);
     equipmentType.addEventListener('change', updateBrands);
     updateBrands();
 }
