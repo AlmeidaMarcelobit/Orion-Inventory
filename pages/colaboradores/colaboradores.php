@@ -88,7 +88,7 @@ usort($colaboradores, fn($a,$b) => strcasecmp($a['nome'] ?? '', $b['nome'] ?? ''
 <li class="item-menu active"><a href="colaboradores.php"><span class="item"><i class="bi bi-person"></i></span><span class="txt-link">Colaboradores</span></a></li>
 <li class="item-menu"><a href="../equipamentos/equipamentos.php"><span class="item"><i class="bi bi-pc-display-horizontal"></i></span><span class="txt-link">Equipamentos</span></a></li>
 <li class="item-menu"><a href="../linhas/linhas.php"><span class="item"><i class="bi bi-sd-card"></i></span><span class="txt-link">Linhas</span></a></li>
-<li class="item-menu"><a href="#"><span class="item"><i class="bi bi-file-earmark-pdf"></i></span><span class="txt-link">Termos</span></a></li>
+<li class="item-menu"><a href="../termos/termos.php"><span class="item"><i class="bi bi-file-earmark-pdf"></i></span><span class="txt-link">Termos</span></a></li>
 <li class="item-menu"><a href="#"><span class="item"><i class="bi bi-tools"></i></span><span class="txt-link">Manutenção</span></a></li>
 <li class="item-menu"><a href="#"><span class="item"><i class="bi bi-person-circle"></i></span><span class="txt-link">Usuários</span></a></li>
 </ul></nav>

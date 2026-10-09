@@ -47,7 +47,7 @@ if (!isset($_SESSION['usuario_id'])) {
                         </a>
                     </li>
                     <li class="item-menu">
-                        <a href="">
+                        <a href="../termos/termos.php">
                             <span class="item"><i class="bi bi-file-earmark-pdf"></i></span>
                             <span class="txt-link">Termos</span>
                         </a>
