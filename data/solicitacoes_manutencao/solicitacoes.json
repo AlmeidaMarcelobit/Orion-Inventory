@@ -1,0 +1,450 @@
+[
+    {
+        "id": 1,
+        "tipo_equipamento": "celular",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "439",
+        "patrimonio": "538",
+        "destino_reparo": "diego",
+        "descricao_problema": "Celular não esta carregando",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-19 16:08:57",
+        "status": "aguardando_envio",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-19 16:08:57",
+                "usuario": "Administrador"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    },
+    {
+        "id": 2,
+        "tipo_equipamento": "celular",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "441",
+        "patrimonio": "847",
+        "destino_reparo": "diego",
+        "descricao_problema": "Celular se encontra bloqueado",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-19 17:06:58",
+        "status": "aguardando_envio",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-19 17:06:58",
+                "usuario": "Administrador"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    },
+    {
+        "id": 3,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "443",
+        "patrimonio": "313",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Na parte plástica, à esquerda do teclado, próximo à tecla fixa, há plástico quebrado, Logo acima da porta Thunderbolt",
+        "prioridade": "normal",
+        "responsavel_envio": "Felix Rodriguez",
+        "data_envio": "2026-08-20 16:43:49",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 16:43:49",
+                "usuario": "Felix Rodriguez"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:53:40",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 4,
+        "usuario_cadastro_nome": "Felix Rodriguez"
+    },
+    {
+        "id": 5,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "444",
+        "patrimonio": "084",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Constatado trinca \/ rachadura na carcaça lateral do notebook",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 16:48:30",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 16:48:30",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:53:34",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    },
+    {
+        "id": 6,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "445",
+        "patrimonio": "184",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Quebrado na parte superior, junto ao teclado, à esquerda, exatamente ao lado do botão Esc e acima da porta USB lateral, Na parte inferior, o parafuso superior do lado direito não fecha a tampa, que fica aberta",
+        "prioridade": "normal",
+        "responsavel_envio": "Felix Rodriguez",
+        "data_envio": "2026-08-20 16:53:01",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 16:53:01",
+                "usuario": "Felix Rodriguez"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:53:29",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 4,
+        "usuario_cadastro_nome": "Felix Rodriguez"
+    },
+    {
+        "id": 7,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "153",
+        "patrimonio": "405",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Dobradiça da tela, do lado esquerdo, quebrada",
+        "prioridade": "normal",
+        "responsavel_envio": "Felix Rodriguez",
+        "data_envio": "2026-08-20 16:55:04",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 16:55:04",
+                "usuario": "Felix Rodriguez"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:53:23",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 4,
+        "usuario_cadastro_nome": "Felix Rodriguez"
+    },
+    {
+        "id": 8,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "446",
+        "patrimonio": "1512",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Constatado trinca rachadura na carcaça lateral, região da dobradiça, (lado da fixação da tela)",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 16:59:38",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 16:59:38",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:53:17",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    },
+    {
+        "id": 9,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "447",
+        "patrimonio": "493",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Computador não esta ligando",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:12:35",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:12:35",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:53:11",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    },
+    {
+        "id": 10,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "87",
+        "patrimonio": "200",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Carcaça quebrado na parte da tela",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:16:58",
+        "status": "concluido",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:16:58",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-08-20 17:17:07",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            },
+            {
+                "status": "concluido",
+                "data": "2026-09-16 17:58:07",
+                "usuario": "Administrador",
+                "destino_conclusao": "estoque"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador",
+        "data_conclusao": "2026-09-16 17:58:07",
+        "destino_conclusao": "estoque"
+    },
+    {
+        "id": 11,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "88",
+        "patrimonio": "2229",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Ativação da bateria",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:18:20",
+        "status": "concluido",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:18:20",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-08-20 17:18:24",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            },
+            {
+                "status": "concluido",
+                "data": "2026-09-16 17:57:50",
+                "usuario": "Administrador",
+                "destino_conclusao": "estoque"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador",
+        "data_conclusao": "2026-09-16 17:57:50",
+        "destino_conclusao": "estoque"
+    },
+    {
+        "id": 12,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "80",
+        "patrimonio": "005",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Tela ruim",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:21:26",
+        "status": "concluido",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:21:26",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-08-20 17:22:08",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            },
+            {
+                "status": "concluido",
+                "data": "2026-09-16 17:58:27",
+                "usuario": "Administrador",
+                "destino_conclusao": "estoque"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador",
+        "data_conclusao": "2026-09-16 17:58:27",
+        "destino_conclusao": "estoque"
+    },
+    {
+        "id": 13,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "81",
+        "patrimonio": "163",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Problema de teclado",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:22:04",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:22:04",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-08-20 17:22:10",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    },
+    {
+        "id": 14,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "82",
+        "patrimonio": "2266",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Problema de teclado",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:23:04",
+        "status": "concluido",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:23:04",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-08-20 17:23:09",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            },
+            {
+                "status": "concluido",
+                "data": "2026-09-16 17:57:26",
+                "usuario": "Administrador",
+                "destino_conclusao": "estoque"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador",
+        "data_conclusao": "2026-09-16 17:57:26",
+        "destino_conclusao": "estoque"
+    },
+    {
+        "id": 15,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "89",
+        "patrimonio": "235",
+        "destino_reparo": "claudio",
+        "descricao_problema": "Estrutura do computador danificado",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-20 17:24:25",
+        "status": "concluido",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-20 17:24:25",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-08-20 17:24:27",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            },
+            {
+                "status": "concluido",
+                "data": "2026-09-16 17:59:13",
+                "usuario": "Administrador",
+                "destino_conclusao": "estoque"
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador",
+        "data_conclusao": "2026-09-16 17:59:13",
+        "destino_conclusao": "estoque"
+    },
+    {
+        "id": 16,
+        "tipo_equipamento": "notebook",
+        "outro_especificar": "",
+        "equipamento_relacionado_id": "476",
+        "patrimonio": "1462",
+        "destino_reparo": "claudio",
+        "descricao_problema": "dobradiça quebrada",
+        "prioridade": "normal",
+        "responsavel_envio": "Administrador",
+        "data_envio": "2026-08-31 13:54:54",
+        "status": "em_manutencao",
+        "historico_status": [
+            {
+                "status": "aguardando_envio",
+                "data": "2026-08-31 13:54:54",
+                "usuario": "Administrador"
+            },
+            {
+                "status": "em_manutencao",
+                "data": "2026-09-16 17:52:54",
+                "usuario": "Administrador",
+                "destino_conclusao": null
+            }
+        ],
+        "usuario_cadastro_id": 1,
+        "usuario_cadastro_nome": "Administrador"
+    }
+]
