@@ -1,0 +1,34 @@
+{
+    "marcas_por_tipo": {
+        "desktop": ["Dell", "Lenovo", "Asus", "Samsung"],
+        "notebook": ["Dell", "Lenovo", "Asus", "Samsung"],
+        "celular": ["Samsung", "Motorola", "LG"],
+        "suporte": ["Fussem"],
+        "tv": ["Samsung", "LG"],
+        "monitor": ["Samsung", "Dell", "AOC", "LG", "Philips"],
+        "teclado": ["Dell", "Logitech", "Philips"],
+        "mouse": ["Dell", "Logitech", "Philips"],
+        "fone": ["Jabra", "Logitech", "Gamenot"]
+    },
+    "modelos_por_tipo": {
+        "fone": {
+            "Jabra": ["HSC015", "HSC016"],
+            "Logitech": ["H390"],
+            "Gamenot": ["FUXI-H3"]
+        },
+        "celular": {
+            "Motorola": ["Galaxy A02", "Galaxy A03 Core", "Galaxy A03", "Galaxy A03s", "Galaxy A06", "Galaxy A07"],
+            "Samsung": ["E22", "E13"]
+        },
+        "monitor": {
+            "Dell": ["P2018H", "E1920HF", "S2725HSMT"],
+            "Samsung": ["F24T350FHL"],
+            "LG": ["22MP410-BB", "FLATRON EC-PN"],
+            "AOC": ["E970SWNJ"]
+        }
+    },
+    "suporte_fixo": {
+        "marca": "Fussem",
+        "modelo": "Alumínio"
+    }
+}
