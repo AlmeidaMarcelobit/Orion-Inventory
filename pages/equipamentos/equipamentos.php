@@ -1,9 +1,12 @@
 <?php
 session_start();
+$paginaAcao = $paginaAcao ?? false;
 require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
 orionRegistrarAtividade();
 if (!isset($_SESSION['usuario_id'])) { header('Location: ../../index.php'); exit; }
 date_default_timezone_set('America/Sao_Paulo');
+if (!$paginaAcao && in_array((string)($_GET['acao'] ?? ''), ['adicionar','editar','alocar','desvincular'], true)) { $parametros = $_GET; $acaoLink = $parametros['acao']; unset($parametros['acao']); header('Location: ' . $acaoLink . '.php' . ($parametros ? '?' . http_build_query($parametros) : '')); exit; }
+
 $base = dirname(__DIR__, 2);
 $marcasPorTipo = [
     'desktop' => ['Dell', 'Lenovo', 'Asus', 'Samsung'],
@@ -260,10 +263,10 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <a href="../../logout.php" class="sair-btn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
 </header>
 <main class="equipment-page">
-<div class="equipment-heading"><div><h1><i class="fas fa-laptop" aria-hidden="true"></i> Equipamentos</h1><p>Gerencie o inventário e a alocação dos equipamentos.</p></div><a class="equipment-primary" href="?acao=adicionar"><i class="fas fa-plus" aria-hidden="true"></i> Adicionar equipamento</a></div>
+<div class="equipment-heading"><div><h1><i class="fas fa-laptop" aria-hidden="true"></i> Equipamentos</h1><p>Gerencie o inventário e a alocação dos equipamentos.</p></div><a class="equipment-primary" href="adicionar.php"><i class="fas fa-plus" aria-hidden="true"></i> Adicionar equipamento</a></div>
 <?php if ($erro): ?><p class="equipment-notice equipment-error" role="alert"><?= h($erro) ?></p><?php endif; ?>
 <?php if ($mensagem): ?><p class="equipment-notice" role="status"><?= h($mensagem) ?></p><?php endif; ?>
-<?php if (in_array($acaoForm, ['adicionar', 'editar', 'alocar'], true) && ($acaoForm === 'adicionar' || $selecionado)): $registro = $selecionado ?? []; ?>
+<?php if ($paginaAcao && in_array($acaoForm, ['adicionar', 'editar', 'alocar'], true) && ($acaoForm === 'adicionar' || $selecionado)): $registro = $selecionado ?? []; ?>
 <section class="equipment-form-panel"><h2><?= ['adicionar' => 'Adicionar equipamento', 'editar' => 'Editar equipamento', 'alocar' => 'Alocar equipamento'][$acaoForm] ?></h2>
 <form method="post" class="equipment-form">
 <input type="hidden" name="csrf" value="<?= h($_SESSION['equipamentos_csrf']) ?>"><input type="hidden" name="acao" value="<?= h($acaoForm) ?>"><input type="hidden" name="id" value="<?= h($registro['id'] ?? '') ?>"><input type="hidden" name="origem" value="<?= h($registro['_origem'] ?? $registro['origem'] ?? '') ?>">
@@ -290,6 +293,10 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <div class="equipment-form-wide equipment-form-actions"><button class="equipment-primary" type="submit"><?= $acaoForm === 'adicionar' ? 'Adicionar' : 'Salvar' ?></button><a class="equipment-secondary" href="equipamentos.php">Cancelar</a></div>
 </form></section>
 <?php endif; ?>
+<?php if ($paginaAcao && $acaoForm === 'desvincular' && $selecionado): ?>
+<section class="equipment-form-panel"><h2>Desvincular equipamento</h2><p><?= h(($selecionado['marca'] ?? '') . ' ' . ($selecionado['modelo'] ?? '') . ' · Patrimônio ' . ($selecionado['patrimonio'] ?? '')) ?></p><p>O equipamento voltará ao inventário com centro de custo 11001.</p><form method="post" class="equipment-form"><input type="hidden" name="csrf" value="<?= h($_SESSION['equipamentos_csrf']) ?>"><input type="hidden" name="acao" value="desvincular"><input type="hidden" name="id" value="<?= h($selecionado['id']) ?>"><input type="hidden" name="origem" value="<?= h($selecionado['_origem'] ?? $selecionado['origem'] ?? '') ?>"><div class="equipment-form-wide equipment-form-actions"><button class="equipment-primary" type="submit">Confirmar desvinculação</button><a class="equipment-secondary" href="equipamentos.php">Cancelar</a></div></form></section>
+<?php endif; ?>
+<?php if (!$paginaAcao): ?>
 <section class="equipment-filters" aria-label="Filtros de equipamentos"><h2><i class="fas fa-filter" aria-hidden="true"></i> Filtros</h2><form method="get">
 <label class="equipment-collaborator-field" data-collaborator-combobox data-collaborator-filter>Colaborador<select name="colaborador_id"><option value="">Todos os colaboradores</option><?php $pessoasFiltro = $pessoas; foreach ($equipamentos as $equipamentoFiltro) { $idPessoaFiltro = (string)($equipamentoFiltro['colaborador_id'] ?? ''); if ($idPessoaFiltro !== '' && !isset($pessoasFiltro[$idPessoaFiltro])) $pessoasFiltro[$idPessoaFiltro] = ['id' => $idPessoaFiltro, 'nome' => $equipamentoFiltro['colaborador_nome'] ?? 'Colaborador #' . $idPessoaFiltro]; } uasort($pessoasFiltro, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($pessoasFiltro as $pessoa): ?><option value="<?= h($pessoa['id']) ?>" <?= $filtros['colaborador_id'] === (string)$pessoa['id'] ? 'selected' : '' ?>><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <label>Tipo<select name="tipo"><option value="">Todos os tipos</option><?php foreach ($tipos as $tipo): ?><option value="<?= h($tipo) ?>" <?= $filtros['tipo'] === $tipo ? 'selected' : '' ?>><?= h($tipo === 'tv' ? 'TV' : ucfirst($tipo)) ?></option><?php endforeach; ?></select></label>
@@ -305,11 +312,12 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <div class="equipment-field"><span>Marca</span><strong><?= h($item['marca'] ?? '—') ?></strong></div><div class="equipment-field equipment-model"><span>Modelo</span><strong><?= h($item['modelo'] ?? '—') ?></strong><?php if (trim((string)($item['hostname'] ?? '')) !== ''): ?><small>Hostname: <?= h($item['hostname']) ?></small><?php endif; ?></div>
 <div class="equipment-field"><span>Patrimônio</span><strong><?= h($item['patrimonio'] ?? '—') ?></strong><small>Serial: <?= h($item['serial'] ?? '—') ?></small></div>
 <div class="equipment-field equipment-allocation"><span class="equipment-status equipment-status-<?= h(array_key_exists($status, $statusNomes) ? $status : 'outro') ?>"><?= h($statusNomes[$status] ?? $status) ?></span><strong><?= h($nome) ?></strong></div>
-<div class="equipment-actions"><a class="equipment-action" href="?acao=editar&amp;<?= h($query) ?>" aria-label="Editar equipamento <?= h($item['patrimonio']) ?>"><i class="fas fa-pen" aria-hidden="true"></i> Editar</a>
-<?php if ($status === 'estoque' && !$pessoaId): ?><a class="equipment-action" href="?acao=alocar&amp;<?= h($query) ?>"><i class="fas fa-user-plus" aria-hidden="true"></i> Alocar</a><?php elseif (in_array($status, ['alocado', 'emprestado'], true) && $pessoaId): ?>
-<form method="post" data-confirm="Desvincular este equipamento e devolvê-lo ao estoque?"><input type="hidden" name="csrf" value="<?= h($_SESSION['equipamentos_csrf']) ?>"><input type="hidden" name="acao" value="desvincular"><input type="hidden" name="id" value="<?= h($item['id']) ?>"><input type="hidden" name="origem" value="<?= h($item['_origem']) ?>"><button class="equipment-action equipment-unlink" type="submit"><i class="fas fa-link-slash" aria-hidden="true"></i> Desvincular</button></form>
+<div class="equipment-actions"><a class="equipment-action" href="editar.php?<?= h($query) ?>" aria-label="Editar equipamento <?= h($item['patrimonio']) ?>"><i class="fas fa-pen" aria-hidden="true"></i> Editar</a>
+<?php if ($status === 'estoque' && !$pessoaId): ?><a class="equipment-action" href="alocar.php?<?= h($query) ?>"><i class="fas fa-user-plus" aria-hidden="true"></i> Alocar</a><?php elseif (in_array($status, ['alocado', 'emprestado'], true) && $pessoaId): ?>
+<a class="equipment-action equipment-unlink" href="desvincular.php?<?= h($query) ?>"><i class="fas fa-link-slash" aria-hidden="true"></i> Desvincular</a>
 <?php endif; ?></div></article>
 <?php endforeach; ?></section>
+<?php endif; ?>
 </main>
 <footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer>
 </body></html>
