@@ -8,32 +8,8 @@ date_default_timezone_set('America/Sao_Paulo');
 if (!$paginaAcao && in_array((string)($_GET['acao'] ?? ''), ['adicionar','editar','alocar','desvincular'], true)) { $parametros = $_GET; $acaoLink = $parametros['acao']; unset($parametros['acao']); header('Location: ' . $acaoLink . '.php' . ($parametros ? '?' . http_build_query($parametros) : '')); exit; }
 
 $base = dirname(__DIR__, 2);
-$marcasPorTipo = [
-    'desktop' => ['Dell', 'Lenovo', 'Asus', 'Samsung'],
-    'notebook' => ['Dell', 'Lenovo', 'Asus', 'Samsung'],
-    'celular' => ['Samsung', 'Motorola', 'LG'],
-    'suporte' => ['Fussem'],
-    'tv' => ['Samsung', 'LG'],
-    'monitor' => ['Samsung', 'Dell', 'AOC', 'LG', 'Philips'],
-    'teclado' => ['Dell', 'Logitech', 'Philips'],
-    'mouse' => ['Dell', 'Logitech', 'Philips'],
-    'fone' => ['Jabra', 'Logitech', 'Gamenot'],
-];
-$modelosFone = ['Jabra' => ['HSC015', 'HSC016'], 'Logitech' => ['H390'], 'Gamenot' => ['FUXI-H3']];
-$modelosPorTipo = [
-    'fone' => $modelosFone,
-    'celular' => [
-        'Motorola' => ['Galaxy A02', 'Galaxy A03 Core', 'Galaxy A03', 'Galaxy A03s', 'Galaxy A06', 'Galaxy A07'],
-        'Samsung' => ['E22', 'E13'],
-    ],
-    'monitor' => [
-        'Dell' => ['P2018H', 'E1920HF', 'S2725HSMT'],
-        'Samsung' => ['F24T350FHL'],
-        'LG' => ['22MP410-BB', 'FLATRON EC-PN'],
-        'AOC' => ['E970SWNJ'],
-    ],
-];
-$marcasGerais = array_values(array_filter(array_map('trim', file($base . '/marca/marcar.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [])));
+$marcasPorTipo = $modelosPorTipo = $marcasGerais = [];
+$suporteFixo = ['marca' => '', 'modelo' => ''];
 $fontes = ['alocado' => 'alocados', 'emprestado' => 'emprestados', 'estoque' => 'estoque', 'fora_uso' => 'fora_uso', 'interno' => 'internos', 'manutencao' => 'manutencao'];
 $statusNomes = ['alocado' => 'Alocado', 'emprestado' => 'Emprestado', 'estoque' => 'Em estoque', 'fora_uso' => 'Fora de uso', 'interno' => 'Uso interno', 'manutencao' => 'Em manutenção', 'pendente_devolucao' => 'Devolução pendente'];
 $icones = ['notebook' => 'laptop', 'desktop' => 'desktop', 'monitor' => 'display', 'fone' => 'headphones', 'mouse' => 'computer-mouse', 'teclado' => 'keyboard', 'tv' => 'tv', 'celular' => 'mobile-screen'];
@@ -56,6 +32,26 @@ $listas = [];
 $pessoas = [];
 $ativos = [];
 try {
+    $arquivoCatalogo = $base . '/data/marca/marca.json';
+    if (!is_readable($arquivoCatalogo)) throw new RuntimeException('Catálogo de marcas indisponível.');
+    $catalogo = json_decode(file_get_contents($arquivoCatalogo), true, 512, JSON_THROW_ON_ERROR);
+    if (!is_array($catalogo) || !is_array($catalogo['marcas_por_tipo'] ?? null) || empty($catalogo['marcas_por_tipo']) || !is_array($catalogo['modelos_por_tipo'] ?? null) || !is_array($catalogo['suporte_fixo'] ?? null)) throw new RuntimeException('Catálogo de marcas inválido.');
+    $marcasPorTipo = $catalogo['marcas_por_tipo'];
+    $modelosPorTipo = $catalogo['modelos_por_tipo'];
+    $suporteFixo = $catalogo['suporte_fixo'];
+    foreach ($marcasPorTipo as $marcas) {
+        if (!is_array($marcas) || !$marcas) throw new RuntimeException('Lista de marcas inválida.');
+        foreach ($marcas as $marca) if (!is_string($marca) || trim($marca) === '') throw new RuntimeException('Marca inválida.');
+    }
+    foreach ($modelosPorTipo as $tipoCatalogo => $marcas) {
+        if (!is_array($marcas)) throw new RuntimeException('Lista de modelos inválida.');
+        foreach ($marcas as $marca => $modelos) {
+            if (!in_array($marca, $marcasPorTipo[$tipoCatalogo] ?? [], true) || !is_array($modelos) || !$modelos) throw new RuntimeException('Modelos inválidos para a marca.');
+            foreach ($modelos as $modelo) if (!is_string($modelo) || trim($modelo) === '') throw new RuntimeException('Modelo inválido.');
+        }
+    }
+    if (!is_string($suporteFixo['marca'] ?? null) || !in_array($suporteFixo['marca'], $marcasPorTipo['suporte'] ?? [], true) || !is_string($suporteFixo['modelo'] ?? null) || trim($suporteFixo['modelo']) === '') throw new RuntimeException('Configuração de suporte inválida.');
+    $marcasGerais = array_values(array_unique(array_merge(...array_values($marcasPorTipo))));
     foreach (['ativos', 'inativos', 'terceiros'] as $grupo) {
         foreach (lerLista($base . '/data/colaboradores/' . $grupo . '.json') as $pessoa) {
             $pessoas[(string)$pessoa['id']] = $pessoa;
@@ -95,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$erro) {
             }
             $item['tipo'] = strtolower($item['tipo']);
             if (in_array($acao, ['adicionar', 'editar'], true)) {
-                if ($item['tipo'] === 'suporte') { $item['marca'] = 'Fussem'; $item['modelo'] = 'Alumínio'; }
+                if ($item['tipo'] === 'suporte') { $item['marca'] = $suporteFixo['marca']; $item['modelo'] = $suporteFixo['modelo']; }
                 $marcasPermitidas = $marcasPorTipo[$item['tipo']] ?? $marcasGerais;
                 $marcaValida = null;
                 foreach ($marcasPermitidas as $marcaPermitida) if (strcasecmp($marcaPermitida, (string)$item['marca']) === 0) { $marcaValida = $marcaPermitida; break; }
@@ -282,8 +278,8 @@ $mensagem = $_SESSION['equipamentos_mensagem'] ?? ''; unset($_SESSION['equipamen
 <label>Status<select name="status" class="equipment-type-select" data-equipment-status required <?= $statusBloqueado ? 'disabled' : '' ?>><?php foreach ($opcoesStatus as $valor => $rotulo): ?><option value="<?= h($valor) ?>" <?= $statusForm === $valor ? 'selected' : '' ?>><?= h($rotulo) ?></option><?php endforeach; ?></select><?php if ($statusBloqueado): ?><small>O status é gerido na área de manutenção.</small><?php endif; ?></label>
 <label class="equipment-collaborator-field" data-collaborator-combobox data-status-collaborator <?= !$formVinculado ? 'hidden' : '' ?>>Colaborador<select name="colaborador_id" <?= $formVinculado ? 'required' : 'disabled' ?>><option value="">Selecione um colaborador</option><?php $pessoasFormulario = $ativos; $idAtual = (string)($registro['colaborador_id'] ?? ''); if ($idAtual !== '' && !isset($pessoasFormulario[$idAtual])) $pessoasFormulario[$idAtual] = $pessoas[$idAtual] ?? ['id' => $idAtual, 'nome' => $registro['colaborador_nome'] ?? 'Colaborador #' . $idAtual]; uasort($pessoasFormulario, fn($a, $b) => strcasecmp($a['nome'], $b['nome'])); foreach ($pessoasFormulario as $pessoa): ?><option value="<?= h($pessoa['id']) ?>" <?= $idAtual === (string)$pessoa['id'] ? 'selected' : '' ?>><?= h($pessoa['nome'] . ' · ' . ($pessoa['departamento'] ?? '')) ?></option><?php endforeach; ?></select></label>
 <label>Tipo<select name="tipo" class="equipment-type-select" data-equipment-type required><option value="">Selecione o tipo</option><?php $tiposFormulario = array_values(array_unique(array_merge(['notebook', 'desktop', 'monitor', 'fone', 'mouse', 'teclado', 'tv', 'celular', 'suporte'], $tipos, array_filter([$registro['tipo'] ?? ''])))); sort($tiposFormulario); foreach ($tiposFormulario as $tipo): ?><option value="<?= h($tipo) ?>" <?= ($registro['tipo'] ?? '') === $tipo ? 'selected' : '' ?>><?= h($tipo === 'tv' ? 'TV' : ucfirst($tipo)) ?></option><?php endforeach; ?></select></label>
-<label>Marca<select name="marca" class="equipment-type-select" data-equipment-brand data-model-catalog="<?= h(json_encode($modelosPorTipo, JSON_UNESCAPED_UNICODE)) ?>" data-brands="<?= h(json_encode($marcasPorTipo, JSON_UNESCAPED_UNICODE)) ?>" data-default-brands="<?= h(json_encode($marcasGerais, JSON_UNESCAPED_UNICODE)) ?>" required><option value="">Selecione a marca</option><?php foreach (($marcasPorTipo[$registro['tipo'] ?? ''] ?? $marcasGerais) as $marca): ?><option value="<?= h($marca) ?>" <?= strcasecmp($marca, (string)($registro['marca'] ?? '')) === 0 ? 'selected' : '' ?>><?= h($marca) ?></option><?php endforeach; ?></select></label>
-<?php foreach (['modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h(($registro['tipo'] ?? '') === 'suporte' && $campo === 'modelo' ? 'Alumínio' : ($registro[$campo] ?? '')) ?>" maxlength="255" <?= in_array($campo, ['modelo', 'patrimonio'], true) ? 'required' : '' ?> <?= ($registro['tipo'] ?? '') === 'suporte' && $campo === 'modelo' ? 'readonly' : '' ?> <?= isset($modelosPorTipo[$registro['tipo'] ?? ''][$registro['marca'] ?? '']) && $campo === 'modelo' ? 'hidden disabled' : '' ?>><?php if ($campo === 'modelo'): ?><select name="modelo" class="equipment-type-select" data-model-select <?= isset($modelosPorTipo[$registro['tipo'] ?? ''][$registro['marca'] ?? '']) ? 'required' : 'hidden disabled' ?>><option value="">Selecione o modelo</option><?php foreach (($modelosPorTipo[$registro['tipo'] ?? ''][$registro['marca'] ?? ''] ?? []) as $modeloFone): ?><option value="<?= h($modeloFone) ?>" <?= strcasecmp($modeloFone, (string)($registro['modelo'] ?? '')) === 0 ? 'selected' : '' ?>><?= h($modeloFone) ?></option><?php endforeach; ?></select><?php endif; ?></label><?php endforeach; ?>
+<label>Marca<select name="marca" class="equipment-type-select" data-equipment-brand data-fixed-support="<?= h(json_encode($suporteFixo, JSON_UNESCAPED_UNICODE)) ?>" data-model-catalog="<?= h(json_encode($modelosPorTipo, JSON_UNESCAPED_UNICODE)) ?>" data-brands="<?= h(json_encode($marcasPorTipo, JSON_UNESCAPED_UNICODE)) ?>" data-default-brands="<?= h(json_encode($marcasGerais, JSON_UNESCAPED_UNICODE)) ?>" required><option value="">Selecione a marca</option><?php foreach (($marcasPorTipo[$registro['tipo'] ?? ''] ?? $marcasGerais) as $marca): ?><option value="<?= h($marca) ?>" <?= strcasecmp($marca, (string)($registro['marca'] ?? '')) === 0 ? 'selected' : '' ?>><?= h($marca) ?></option><?php endforeach; ?></select></label>
+<?php foreach (['modelo' => 'Modelo', 'patrimonio' => 'Patrimônio', 'serial' => 'Serial'] as $campo => $rotulo): ?><label><?= $rotulo ?><input name="<?= $campo ?>" value="<?= h(($registro['tipo'] ?? '') === 'suporte' && $campo === 'modelo' ? $suporteFixo['modelo'] : ($registro[$campo] ?? '')) ?>" maxlength="255" <?= in_array($campo, ['modelo', 'patrimonio'], true) ? 'required' : '' ?> <?= ($registro['tipo'] ?? '') === 'suporte' && $campo === 'modelo' ? 'readonly' : '' ?> <?= isset($modelosPorTipo[$registro['tipo'] ?? ''][$registro['marca'] ?? '']) && $campo === 'modelo' ? 'hidden disabled' : '' ?>><?php if ($campo === 'modelo'): ?><select name="modelo" class="equipment-type-select" data-model-select <?= isset($modelosPorTipo[$registro['tipo'] ?? ''][$registro['marca'] ?? '']) ? 'required' : 'hidden disabled' ?>><option value="">Selecione o modelo</option><?php foreach (($modelosPorTipo[$registro['tipo'] ?? ''][$registro['marca'] ?? ''] ?? []) as $modeloFone): ?><option value="<?= h($modeloFone) ?>" <?= strcasecmp($modeloFone, (string)($registro['modelo'] ?? '')) === 0 ? 'selected' : '' ?>><?= h($modeloFone) ?></option><?php endforeach; ?></select><?php endif; ?></label><?php endforeach; ?>
 <?php $especificacoesForm = is_array($registro['especificacoes'] ?? null) ? $registro['especificacoes'] : []; $computador = in_array($registro['tipo'] ?? '', ['notebook', 'desktop'], true); ?>
 <fieldset class="equipment-technical equipment-form-wide" data-equipment-technical <?= !$computador ? 'hidden disabled' : '' ?>><legend>Configuração do computador</legend><div class="equipment-technical-grid">
 <div class="equipment-hostname-field" data-hostname-combobox><label for="equipment-hostname">Hostname</label><div class="equipment-hostname-control"><input id="equipment-hostname" name="hostname" value="<?= h($registro['hostname'] ?? '') ?>" maxlength="255" placeholder="<?= h($hostnamesDisponiveis[0] ?? 'Nome personalizado') ?>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="equipment-hostnames" aria-describedby="equipment-hostname-hint"><button type="button" class="equipment-hostname-toggle" aria-label="Mostrar sugestões de hostname" aria-controls="equipment-hostnames" aria-expanded="false"><i class="fas fa-chevron-down" aria-hidden="true"></i></button></div><div class="equipment-hostname-dropdown" hidden><div id="equipment-hostnames" role="listbox" aria-label="Hostnames disponíveis"><?php foreach ($hostnamesDisponiveis as $indiceHostname => $hostname): ?><div class="equipment-hostname-option" id="hostname-option-<?= $indiceHostname ?>" role="option" aria-selected="false" data-value="<?= h($hostname) ?>"><?= h($hostname) ?></div><?php endforeach; ?></div><p class="equipment-hostname-empty" hidden>Nenhuma sugestão disponível. Você pode usar um nome personalizado.</p></div><small id="equipment-hostname-hint">Selecione um hostname disponível ou digite um nome personalizado.</small></div>

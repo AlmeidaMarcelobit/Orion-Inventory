@@ -12,6 +12,7 @@ if (equipmentType && equipmentBrand) {
     const model = equipmentBrand.closest('form').querySelector('input[name="modelo"]');
     const headsetModel = equipmentBrand.closest('form').querySelector('[data-model-select]');
     const modelCatalog = JSON.parse(equipmentBrand.dataset.modelCatalog);
+    const fixedSupport = JSON.parse(equipmentBrand.dataset.fixedSupport);
     let savedModel = model.value;
     let wasSupport = equipmentType.value === 'suporte';
     const updateModels = () => {
@@ -37,9 +38,9 @@ if (equipmentType && equipmentBrand) {
         const support = equipmentType.value === 'suporte';
         if (support) {
             if (!wasSupport) savedModel = model.value;
-            equipmentBrand.value = 'Fussem';
-            model.value = 'Alumínio';
-        } else if (wasSupport) model.value = savedModel === 'Alumínio' ? '' : savedModel;
+            equipmentBrand.value = fixedSupport.marca;
+            model.value = fixedSupport.modelo;
+        } else if (wasSupport) model.value = savedModel === fixedSupport.modelo ? '' : savedModel;
         model.readOnly = support;
         wasSupport = support;
         updateModels();
