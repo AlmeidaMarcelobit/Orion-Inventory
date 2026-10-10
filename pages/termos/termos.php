@@ -1,5 +1,7 @@
 <?php
 session_start();
+$paginaAcao = $paginaAcao ?? false;
+$acaoPagina = $acaoPagina ?? '';
 require_once dirname(__DIR__, 2) . '/includes/auditoria.php';
 orionRegistrarAtividade();
 if (!isset($_SESSION["usuario_id"])) {
@@ -274,7 +276,7 @@ if ($mensagem): ?><p class="equipment-notice" role="status"><?= h($mensagem) ?><
 <?php if (isset($_GET["novo"])): ?><p class="terms-new"><a class="equipment-primary" href="?acao=arquivo&amp;id=<?= h(
     $_GET["novo"]
 ) ?>" target="_blank" rel="noopener">Abrir termo criado / imprimir</a></p><?php endif; ?>
-<section class="equipment-filters"><h2>Colaborador</h2><form method="get"><label class="equipment-collaborator-field" data-collaborator-combobox>Buscar colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php
+<?php if ($paginaAcao): ?><a class="equipment-secondary" href="termos.php">Voltar à lista</a><?php endif; ?><section class="equipment-filters"><h2>Colaborador</h2><form method="get"><label class="equipment-collaborator-field" data-collaborator-combobox>Buscar colaborador<select name="colaborador_id" required><option value="">Selecione um colaborador</option><?php
 uasort($pessoas, fn($a, $b) => strcasecmp($a["nome"], $b["nome"]));
 foreach ($pessoas as $pessoa): ?><option value="<?= h($pessoa["id"]) ?>" <?= $idPessoa === (string) $pessoa["id"]
     ? "selected"
@@ -290,9 +292,9 @@ foreach ($pessoas as $pessoa): ?><option value="<?= h($pessoa["id"]) ?>" <?= $id
     ["matricula" => "Matrícula", "cpf" => "CPF", "email" => "E-mail", "tipo_trabalho" => "Tipo de trabalho"]
     as $campo => $rotulo
 ): ?><div><dt><?= $rotulo ?></dt><dd><?= h($colaborador[$campo] ?? "—") ?></dd></div><?php endforeach; ?></dl>
-<form method="post" class="terms-generate"><input type="hidden" name="acao" value="gerar"><input type="hidden" name="csrf" value="<?= h(
+<?php if (!$paginaAcao): ?><div class="terms-actions"><a class="equipment-primary" href="entrega.php?colaborador_id=<?= h($idPessoa) ?>">Gerar entrega</a><a class="equipment-secondary" href="devolucao.php?colaborador_id=<?= h($idPessoa) ?>">Gerar devolução</a><a class="equipment-secondary" href="upload.php?colaborador_id=<?= h($idPessoa) ?>">Upload</a></div><?php endif; ?><?php if ($acaoPagina !== 'upload'): ?><?= $paginaAcao ? '<form method="post" class="terms-generate">' : '<div class="terms-generate">' ?><?php if ($paginaAcao): ?><input type="hidden" name="acao" value="gerar"><input type="hidden" name="csrf" value="<?= h(
     $_SESSION["termos_csrf"]
-) ?>"><input type="hidden" name="colaborador_id" value="<?= h($idPessoa) ?>"><h2>Equipamentos vinculados (<?= count(
+) ?>"><input type="hidden" name="colaborador_id" value="<?= h($idPessoa) ?>"><?php endif; ?><h2>Equipamentos vinculados (<?= count(
     $vinculados
 ) ?>)</h2><p class="terms-hint">Selecione os itens que devem constar no termo.</p><div class="terms-table-wrap"><table><thead><tr><th>Incluir</th><th>Tipo / marca / modelo</th><th>Patrimônio / serial</th><th>Hostname / status</th><th>Especificações</th><th>Centro de custo</th></tr></thead><tbody><?php
 foreach ($vinculados as $item): ?><tr><td><input type="checkbox" name="equipamentos[]" value="<?= h(
@@ -319,17 +321,10 @@ if (!$vinculados): ?><tr><td colspan="6">Nenhum equipamento vinculado a este col
     $linha["numero"]
 ) ?> · <?= ($linha["tipo"] ?? "") === "echip"
      ? "eSIM"
-     : "Chip físico" ?></label><?php endforeach; ?></div><?php endif; ?><div class="equipment-form"><label class="equipment-form-wide">Observações / condições dos itens<textarea name="observacoes" rows="3" maxlength="5000"><?= h(
+     : "Chip físico" ?></label><?php endforeach; ?></div><?php endif; ?><?php if ($paginaAcao): ?><div class="equipment-form"><label class="equipment-form-wide">Observações / condições dos itens<textarea name="observacoes" rows="3" maxlength="5000"><?= h(
     $_POST["observacoes"] ?? ""
-) ?></textarea></label></div><div class="terms-actions"><button class="equipment-primary" type="submit" name="tipo" value="entrega"><i class="fas fa-arrow-right" aria-hidden="true"></i> Gerar entrega</button><button class="equipment-secondary" type="submit" name="tipo" value="devolucao"><i class="fas fa-arrow-left" aria-hidden="true"></i> Gerar devolução</button><button class="equipment-secondary" type="button" data-upload-toggle aria-controls="terms-upload" aria-expanded="<?= isset(
-    $_GET["upload"]
-)
-    ? "true"
-    : "false" ?>"><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Upload</button></div><p class="terms-hint">Gerar um termo registra o documento; a movimentação dos itens é feita nas páginas de equipamentos e linhas.</p></form></section>
-<section class="equipment-form-panel" id="terms-upload" <?= !isset($_GET["upload"]) &&
-($_POST["acao"] ?? "") !== "upload"
-    ? "hidden"
-    : "" ?>><h2>Enviar termo assinado</h2><form method="post" enctype="multipart/form-data" data-terms-upload><input type="hidden" name="acao" value="upload"><input type="hidden" name="csrf" value="<?= h(
+) ?></textarea></label></div><div class="terms-actions"><button class="equipment-primary" type="submit" name="tipo" value="<?= h($acaoPagina) ?>">Gerar <?= $acaoPagina === 'entrega' ? 'entrega' : 'devolução' ?></button><a class="equipment-secondary" href="termos.php?colaborador_id=<?= h($idPessoa) ?>">Cancelar</a></div><p class="terms-hint">Gerar um termo registra o documento; a movimentação dos itens é feita nas páginas de equipamentos e linhas.</p><?php endif; ?><?= $paginaAcao ? '</form>' : '</div>' ?><?php endif; ?></section>
+<?php if ($paginaAcao && $acaoPagina === 'upload'): ?><section class="equipment-form-panel" id="terms-upload"><h2>Enviar termo assinado</h2><form method="post" enctype="multipart/form-data" data-terms-upload><input type="hidden" name="acao" value="upload"><input type="hidden" name="csrf" value="<?= h(
     $_SESSION["termos_csrf"]
 ) ?>"><input type="hidden" name="colaborador_id" value="<?= h(
     $idPessoa
@@ -339,8 +334,8 @@ if (!$vinculados): ?><tr><td colspan="6">Nenhum equipamento vinculado a este col
     "") ===
 "devolucao"
     ? "selected"
-    : "" ?>>Devolução</option></select></label><label class="terms-dropzone" data-terms-drop><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i><strong>Arraste o arquivo ou clique para selecionar</strong><span>PDF, JPG ou PNG · até 10 MB</span><input type="file" name="arquivo" accept="application/pdf,image/jpeg,image/png" required aria-label="Selecionar termo assinado"><span data-file-name role="status">Nenhum arquivo selecionado.</span></label><div class="terms-actions"><button class="equipment-primary" type="submit">Salvar arquivo</button><button class="equipment-secondary" type="reset">Limpar</button></div></form></section><?php else: ?><div class="equipment-empty"><i class="fas fa-user" aria-hidden="true"></i><p>Selecione um colaborador para carregar os equipamentos e criar um termo.</p></div><?php endif; ?>
-<section class="equipment-form-panel terms-history"><h2>Últimos termos enviados</h2><?php
+    : "" ?>>Devolução</option></select></label><label class="terms-dropzone" data-terms-drop><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i><strong>Arraste o arquivo ou clique para selecionar</strong><span>PDF, JPG ou PNG · até 10 MB</span><input type="file" name="arquivo" accept="application/pdf,image/jpeg,image/png" required aria-label="Selecionar termo assinado"><span data-file-name role="status">Nenhum arquivo selecionado.</span></label><div class="terms-actions"><button class="equipment-primary" type="submit">Salvar arquivo</button><button class="equipment-secondary" type="reset">Limpar</button><a class="equipment-secondary" href="termos.php">Cancelar</a></div></form></section><?php endif; ?><?php else: ?><div class="equipment-empty"><i class="fas fa-user" aria-hidden="true"></i><p>Selecione um colaborador para carregar os equipamentos e criar um termo.</p></div><?php endif; ?>
+<?php if (!$paginaAcao): ?><section class="equipment-form-panel terms-history"><h2>Últimos termos enviados</h2><?php
 if (!$uploads): ?><p class="terms-hint">Nenhum termo enviado ainda.</p><?php endif;
 foreach (
     array_slice($uploads, 0, 15)
@@ -374,4 +369,4 @@ if ($gerados): ?><section class="equipment-form-panel terms-history"><h2>Termos 
 ) ?></time><a class="equipment-secondary" href="?acao=arquivo&amp;id=<?= h($termo["id"]
 ) ?>" target="_blank" rel="noopener">Abrir</a></article><?php endforeach; ?></section><?php endif;
 ?>
-</main><footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer></body></html>
+<?php endif; ?></main><footer><p>Orion Inventory © 2023 - 2026 - Todos os direitos reservados</p></footer></body></html>
