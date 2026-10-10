@@ -1,0 +1,65 @@
+[
+    {
+        "id": "b44c463b6d8139f36ffdb841",
+        "data": "2026-10-09 16:38:17",
+        "acao": "inativar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": null,
+        "sessao_auditoria": "53f92e9a69b6fae2663abab439c19487",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/colaboradores\/colaboradores.php",
+        "dados": {
+            "entidade": "colaborador",
+            "entidade_id": 129,
+            "antes": {
+                "id": 129,
+                "nome": "Guilherme Carnavale De Oliveira",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local"
+            },
+            "depois": {
+                "id": 129,
+                "nome": "Guilherme Carnavale De Oliveira",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local",
+                "ativo": false
+            },
+            "detalhes": {
+                "equipamentos_pendentes": 0
+            }
+        }
+    },
+    {
+        "id": "8a453585e183d17eed61a4d9",
+        "data": "2026-10-10 15:23:31",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "24c1274a0b0d089da6394677a8b8e197",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/colaboradores\/editar.php",
+        "dados": {
+            "entidade": "colaborador",
+            "entidade_id": 178,
+            "antes": {
+                "id": 178,
+                "nome": "Marcelo Mascarenhas De Araujo Almeida",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local"
+            },
+            "depois": {
+                "id": 178,
+                "nome": "Marcelo Mascarenhas De Araujo Almeida",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local"
+            },
+            "detalhes": []
+        }
+    }
+]

@@ -1,0 +1,553 @@
+[
+    {
+        "id": "c705b49c79e31320f8af45ad",
+        "data": "2026-10-09 16:38:17",
+        "acao": "inativar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": null,
+        "sessao_auditoria": "53f92e9a69b6fae2663abab439c19487",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/colaboradores\/colaboradores.php",
+        "dados": {
+            "entidade": "colaborador",
+            "entidade_id": 129,
+            "antes": {
+                "id": 129,
+                "nome": "Guilherme Carnavale De Oliveira",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local"
+            },
+            "depois": {
+                "id": 129,
+                "nome": "Guilherme Carnavale De Oliveira",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local",
+                "ativo": false
+            },
+            "detalhes": {
+                "equipamentos_pendentes": 0
+            }
+        }
+    },
+    {
+        "id": "b1ae996d4b76e0327dd27fd0",
+        "data": "2026-10-09 16:42:30",
+        "acao": "abrir",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": null,
+        "sessao_auditoria": "53f92e9a69b6fae2663abab439c19487",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/chamado\/chamado.php",
+        "dados": {
+            "entidade": "chamado",
+            "entidade_id": 1,
+            "antes": null,
+            "depois": {
+                "id": 1,
+                "colaborador_id": 197,
+                "colaborador_nome": "Fabiola Todesco Quiles",
+                "departamento": "Dental Vidas Administrativo",
+                "categoria": "sistema",
+                "servico": "drive",
+                "status": "aberto"
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "ed8efbc53988fad0deb6ab98",
+        "data": "2026-10-09 18:09:50",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 987,
+            "antes": {
+                "tipo": "monitor",
+                "marca": "DELL",
+                "modelo": "P2018HC",
+                "patrimonio": "012",
+                "serial": "BR-00CPG1-TVB00-05M-1000-A10",
+                "hostname": null,
+                "centro_custo": "12000",
+                "especificacoes": null,
+                "colaborador_id": 302,
+                "status": "alocado",
+                "id": 987
+            },
+            "depois": {
+                "tipo": "monitor",
+                "marca": "Dell",
+                "modelo": "P2018HC",
+                "patrimonio": "012",
+                "serial": "BR-00CPG1-TVB00-05M-1000-A10",
+                "hostname": null,
+                "centro_custo": "12000",
+                "especificacoes": null,
+                "colaborador_id": 302,
+                "status": "alocado",
+                "id": 987
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "0e98d05abdb5da793ff5836c",
+        "data": "2026-10-09 18:10:01",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 536,
+            "antes": {
+                "tipo": "monitor",
+                "marca": "DELL",
+                "modelo": "P2018HC",
+                "patrimonio": "020",
+                "serial": "BR-0VPCHG-TVB00-91E-0I4U-A03",
+                "hostname": null,
+                "centro_custo": "12005",
+                "especificacoes": null,
+                "colaborador_id": 131,
+                "status": "alocado",
+                "id": 536
+            },
+            "depois": {
+                "tipo": "monitor",
+                "marca": "Dell",
+                "modelo": "P2018HC",
+                "patrimonio": "020",
+                "serial": "BR-0VPCHG-TVB00-91E-0I4U-A03",
+                "hostname": null,
+                "centro_custo": "12005",
+                "especificacoes": null,
+                "colaborador_id": 131,
+                "status": "alocado",
+                "id": 536
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "ef00b0d020d86a94b9a5a73d",
+        "data": "2026-10-09 18:27:11",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 987,
+            "antes": {
+                "tipo": "monitor",
+                "marca": "Dell",
+                "modelo": "P2018HC",
+                "patrimonio": "012",
+                "serial": "BR-00CPG1-TVB00-05M-1000-A10",
+                "hostname": null,
+                "centro_custo": "12000",
+                "especificacoes": null,
+                "colaborador_id": 302,
+                "status": "alocado",
+                "id": 987
+            },
+            "depois": {
+                "tipo": "monitor",
+                "marca": "Dell",
+                "modelo": "P2018H",
+                "patrimonio": "012",
+                "serial": "BR-00CPG1-TVB00-05M-1000-A10",
+                "hostname": null,
+                "centro_custo": "12000",
+                "especificacoes": null,
+                "colaborador_id": 302,
+                "status": "alocado",
+                "id": 987
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "d6c60c7038864d0b52d768d9",
+        "data": "2026-10-09 18:28:59",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 891,
+            "antes": {
+                "tipo": "notebook",
+                "marca": "DELL",
+                "modelo": "Vostro 15 3510",
+                "patrimonio": "140",
+                "serial": "17778959103",
+                "hostname": "JANAINA-FRANCOZA",
+                "centro_custo": "12005",
+                "especificacoes": {
+                    "ram": "16GB",
+                    "processador": "Intel Core i5-1035G1",
+                    "hd": "238GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 154,
+                "status": "alocado",
+                "id": 891
+            },
+            "depois": {
+                "tipo": "notebook",
+                "marca": "Dell",
+                "modelo": "Vostro 15 3510",
+                "patrimonio": "140",
+                "serial": "17778959103",
+                "hostname": "JANAINA-FRANCOZA",
+                "centro_custo": "12005",
+                "especificacoes": {
+                    "ram": "16GB",
+                    "processador": "Intel Core i5-1035G1",
+                    "hd": "238GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 154,
+                "status": "alocado",
+                "id": 891
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "f1da157272504cca2dddffa0",
+        "data": "2026-10-09 18:29:40",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 934,
+            "antes": {
+                "tipo": "notebook",
+                "marca": "DELL",
+                "modelo": "Vostro 15 3510",
+                "patrimonio": "025",
+                "serial": "37465464855",
+                "hostname": "DRIELE-CORSI",
+                "centro_custo": "12006",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "Intel Core i5-1035G1",
+                    "hd": "238GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 80,
+                "status": "alocado",
+                "id": 934
+            },
+            "depois": {
+                "tipo": "notebook",
+                "marca": "Dell",
+                "modelo": "Vostro 15 3510",
+                "patrimonio": "025",
+                "serial": "37465464855",
+                "hostname": "DRIELE-CORSI",
+                "centro_custo": "12006",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "Intel Core i5-1035G1",
+                    "hd": "238GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 80,
+                "status": "alocado",
+                "id": 934
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "efa595649258c5a83a851a81",
+        "data": "2026-10-10 12:35:48",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 653,
+            "antes": {
+                "tipo": "desktop",
+                "marca": "Dell",
+                "modelo": "Inspiron 3584",
+                "patrimonio": "044",
+                "serial": "J9RJS63",
+                "hostname": "CAMERA-SEDE02",
+                "centro_custo": "11001",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "i3-8130U",
+                    "hd": "128GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": null,
+                "status": "interno",
+                "id": 653
+            },
+            "depois": {
+                "tipo": "notebook",
+                "marca": "Dell",
+                "modelo": "Inspiron 3584",
+                "patrimonio": "044",
+                "serial": "J9RJS63",
+                "hostname": "CAMERA-SEDE02",
+                "centro_custo": "11001",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "i3-8130U",
+                    "hd": "128GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": null,
+                "status": "interno",
+                "id": 653
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "9b668e1cc487b6a07708df6e",
+        "data": "2026-10-10 12:36:58",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 586,
+            "antes": {
+                "tipo": "desktop",
+                "marca": "Dell",
+                "modelo": "Vostro 3520",
+                "patrimonio": "2271",
+                "serial": "1Q35KZ3",
+                "hostname": "CAIQUE-PINHEIRO",
+                "centro_custo": "14011",
+                "especificacoes": {
+                    "ram": "12GB",
+                    "processador": "I5-1135G7",
+                    "hd": "256GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 200,
+                "status": "alocado",
+                "id": 586
+            },
+            "depois": {
+                "tipo": "notebook",
+                "marca": "Dell",
+                "modelo": "Vostro 3520",
+                "patrimonio": "2271",
+                "serial": "1Q35KZ3",
+                "hostname": "CAIQUE-PINHEIRO",
+                "centro_custo": "14011",
+                "especificacoes": {
+                    "ram": "12GB",
+                    "processador": "I5-1135G7",
+                    "hd": "256GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 200,
+                "status": "alocado",
+                "id": 586
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "464dda9288f54249f8ab8334",
+        "data": "2026-10-10 12:37:20",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/equipamentos.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 691,
+            "antes": {
+                "tipo": "desktop",
+                "marca": "Dell",
+                "modelo": "Latitude 3420",
+                "patrimonio": "310",
+                "serial": "CVZHNY3",
+                "hostname": "ANAPAULA-ROMUAL",
+                "centro_custo": "22000",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "i5-1135G7",
+                    "hd": "256GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 26,
+                "status": "alocado",
+                "id": 691
+            },
+            "depois": {
+                "tipo": "notebook",
+                "marca": "Dell",
+                "modelo": "Latitude 3420",
+                "patrimonio": "310",
+                "serial": "CVZHNY3",
+                "hostname": "ANAPAULA-ROMUAL",
+                "centro_custo": "22000",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "i5-1135G7",
+                    "hd": "256GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": 26,
+                "status": "alocado",
+                "id": 691
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "8bf5bf4088a2d0c80a30d2dd",
+        "data": "2026-10-10 12:38:29",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "39e3a1027e4eb53e1e4480505d857e23",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/equipamentos\/editar.php",
+        "dados": {
+            "entidade": "equipamento",
+            "entidade_id": 629,
+            "antes": {
+                "tipo": "desktop",
+                "marca": "Dell",
+                "modelo": "Optiplex 7000",
+                "patrimonio": "2237",
+                "serial": "DKN8NY3",
+                "hostname": "VIDEOWALL-LEFT",
+                "centro_custo": "11001",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "i5-12500T",
+                    "hd": "256GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": null,
+                "status": "interno",
+                "id": 629
+            },
+            "depois": {
+                "tipo": "desktop",
+                "marca": "Dell",
+                "modelo": "OptiPlex 7000",
+                "patrimonio": "2237",
+                "serial": "DKN8NY3",
+                "hostname": "VIDEOWALL-LEFT",
+                "centro_custo": "11001",
+                "especificacoes": {
+                    "ram": "8GB",
+                    "processador": "i5-12500T",
+                    "hd": "256GB",
+                    "sistema_operacional": "Windows 11",
+                    "bit_instalado": true,
+                    "milvus_instalado": true
+                },
+                "colaborador_id": null,
+                "status": "interno",
+                "id": 629
+            },
+            "detalhes": []
+        }
+    },
+    {
+        "id": "d02ca2ff590612ce89717843",
+        "data": "2026-10-10 15:23:31",
+        "acao": "editar",
+        "usuario_id": 1,
+        "usuario_nome": "Administrador",
+        "usuario_login": "admin",
+        "sessao_auditoria": "24c1274a0b0d089da6394677a8b8e197",
+        "ip": "::1",
+        "pagina": "\/Orion-Inventory\/pages\/colaboradores\/editar.php",
+        "dados": {
+            "entidade": "colaborador",
+            "entidade_id": 178,
+            "antes": {
+                "id": 178,
+                "nome": "Marcelo Mascarenhas De Araujo Almeida",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local"
+            },
+            "depois": {
+                "id": 178,
+                "nome": "Marcelo Mascarenhas De Araujo Almeida",
+                "departamento": "Infraestrutura",
+                "centro_custo": "13010",
+                "tipo_trabalho": "local"
+            },
+            "detalhes": []
+        }
+    }
+]
