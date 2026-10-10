@@ -1,0 +1,8 @@
+.lines-page .line-row { grid-template-columns: 86px 1.2fr .8fr 1.5fr 120px; }
+.lines-page .line-status-disponivel { background: #e8f8ef; color: #238654; }
+.lines-page .line-status-alocado { background: #e8f1ff; color: #2374e1; }
+.lines-page .line-status-whatsapp_bloqueado { background: #fff0f0; color: #a72c2c; }
+.lines-page .line-status-indisponivel { background: #fff3d9; color: #8a5b00; }
+.lines-hint { color: var(--orion-muted); font-size: 12px; }
+@media (max-width: 1100px) { .lines-page .line-row { grid-template-columns: 76px repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .lines-page .line-row { grid-template-columns: 64px minmax(0, 1fr); } .lines-page .equipment-icon { grid-row: span 3; } }
