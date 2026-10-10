@@ -1,0 +1,28 @@
+[
+    {
+        "id": 1,
+        "colaborador_id": 197,
+        "colaborador_nome": "Fabiola Todesco Quiles",
+        "departamento": "Dental Vidas Administrativo",
+        "categoria": "sistema",
+        "servico": "drive",
+        "equipamento": null,
+        "sintoma": null,
+        "encaminhamento": null,
+        "descricao": "Computador sem Som",
+        "status": "aberto",
+        "data_abertura": "2026-10-09 16:42:30",
+        "data_atualizacao": "2026-10-09 16:42:30",
+        "usuario_abertura": "Administrador",
+        "usuario_id": 1,
+        "data_fechamento": null,
+        "resolucao": null,
+        "historico": [
+            {
+                "acao": "aberto",
+                "data": "2026-10-09 16:42:30",
+                "usuario": "Administrador"
+            }
+        ]
+    }
+]
