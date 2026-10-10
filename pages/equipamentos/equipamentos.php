@@ -22,6 +22,10 @@ $marcasPorTipo = [
 $modelosFone = ['Jabra' => ['HSC015', 'HSC016'], 'Logitech' => ['H390'], 'Gamenot' => ['FUXI-H3']];
 $modelosPorTipo = [
     'fone' => $modelosFone,
+    'celular' => [
+        'Motorola' => ['Galaxy A02', 'Galaxy A03 Core', 'Galaxy A03', 'Galaxy A03s', 'Galaxy A06', 'Galaxy A07'],
+        'Samsung' => ['E22', 'E13'],
+    ],
     'monitor' => [
         'Dell' => ['P2018H', 'E1920HF', 'S2725HSMT'],
         'Samsung' => ['F24T350FHL'],
